@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7BA5B8"/>
+      <stop offset="100%" style="stop-color:#B8B0C8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <!-- 小鲸鱼 🐋 -->
+  <g transform="translate(256,220)" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 身体 -->
+    <ellipse cx="0" cy="20" rx="90" ry="55"/>
+    <!-- 头部曲线 -->
+    <path d="M-90,20 Q-90,-10 -70,-20 Q-40,-35 0,-35 Q40,-35 70,-20 Q90,-10 90,20"/>
+    <!-- 尾鳍 -->
+    <path d="M85,30 Q120,5 135,20"/>
+    <path d="M85,40 Q120,55 135,40"/>
+    <!-- 眼睛 -->
+    <circle cx="-35" cy="8" r="6" fill="#7BA5B8" stroke="none"/>
+    <circle cx="-35" cy="8" r="3" fill="#fff" stroke="none"/>
+    <!-- 微笑 -->
+    <path d="M-50,25 Q-25,45 0,40" stroke-width="4"/>
+    <!-- 喷水 -->
+    <path d="M-20,-35 Q-15,-55 -25,-70 M-20,-35 Q-5,-60 -8,-80 M-20,-35 Q5,-50 10,-65" stroke-width="4"/>
+    <!-- 胸鳍 -->
+    <path d="M-30,45 Q-50,70 -40,85" stroke-width="5"/>
+  </g>
+  <!-- 星星装饰 -->
+  <g fill="#fff" opacity="0.6">
+    <circle cx="120" cy="90" r="4"/>
+    <circle cx="380" cy="80" r="5"/>
+    <circle cx="400" cy="140" r="3"/>
+    <circle cx="100" cy="150" r="3"/>
+    <circle cx="350" cy="420" r="4"/>
+    <circle cx="140" cy="400" r="3"/>
+    <circle cx="50" cy="280" r="4"/>
+    <circle cx="450" cy="300" r="5"/>
+  </g>
+</svg>

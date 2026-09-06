@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+  <title>鲸鱼机 App</title>
+  <script>
+    try {
+      var _auv = localStorage.getItem('_app_update_version');
+      if (_auv) {
+        var migrateParam = localStorage.getItem('_migration_ready') === '1' ? '&migrate=1' : '';
+        location.replace('https://xiaojingyu.beauty/index.html?updated=' + _auv + migrateParam);
+      } else {
+        location.replace('./index.html?boot=' + Date.now());
+      }
+    } catch(e) {
+      location.replace('./index.html?boot=' + Date.now());
+    }
+  </script>
+</head>
+<body>
+  <a href="./index.html">进入鲸鱼机</a>
+</body>
+</html>

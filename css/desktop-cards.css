@@ -1,0 +1,1775 @@
+/* ═══════════════ 桌面卡片网格 ═══════════════ */
+
+/* ─── 每一页（禁止滚动，由父级 swiper 控制） ─── */
+.desktop-page {
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  /* 桌面页面本身铺满画布；安全区不应缩短壁纸或制造底部色带 */
+  padding-bottom: 0;
+}
+
+/* ─── 网格容器 ─── */
+.desktop-card-grid {
+  display: grid;
+  /* 自适应列宽 + 行高匹配列宽（保持接近正方形） */
+  grid-template-columns: repeat(4, minmax(60px, 1fr));
+  grid-auto-rows: minmax(78px, auto);  /* ★ 78px 确保 App 卡片图标+文字不裁切 */
+  gap: 12px;
+  justify-content: center;
+  align-content: start;  /* 从顶部开始排列，防止退出编辑后卡片下移 */
+  padding: 10px 0;
+  width: calc(100% - 38px);
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.desktop-card-grid::-webkit-scrollbar { display: none; }
+
+/* ─── 基础卡片 ─── */
+.desktop-card {
+  border-radius: var(--card-radius, 18px);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;                    /* ★ 消除 iOS 300ms 延迟 + 防止手势冲突 */
+  -webkit-user-select: none;
+  min-height: 0;
+}
+
+.desktop-card:active {
+  transform: scale(0.94);
+}
+
+/* ─── 材质：磨砂玻璃（App 快捷） ─── */
+.desktop-card.card-frosted {
+  background: var(--card-frosted-bg, rgba(255,255,255,0.45));
+  backdrop-filter: blur(var(--card-frosted-blur, 16px));
+  -webkit-backdrop-filter: blur(var(--card-frosted-blur, 16px));
+  border: 1px solid var(--card-frosted-border, rgba(255,255,255,0.35));
+  box-shadow: var(--card-frosted-shadow, 0 2px 12px rgba(0,0,0,0.04));
+}
+
+/* ★ 快捷 App 卡片：去掉白色包裹，图标直接放在桌面上 */
+.desktop-card.card-type-app-shortcut {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  box-shadow: none;
+}
+.desktop-card.card-type-app-shortcut:hover {
+  background: rgba(255,255,255,0.18);
+  box-shadow: none;
+}
+
+/* ─── 材质：微透（时钟/鲸鱼/天气/便签） ─── */
+.desktop-card.card-light {
+  background: var(--card-light-bg, rgba(255,255,255,0.28));
+  backdrop-filter: blur(var(--card-light-blur, 4px));
+  -webkit-backdrop-filter: blur(var(--card-light-blur, 4px));
+  border: 1px solid var(--card-light-border, rgba(255,255,255,0.25));
+  box-shadow: var(--card-light-shadow, 0 1px 6px rgba(0,0,0,0.03));
+}
+
+/* ─── 材质：自有（照片/拍立得等，不透） ─── */
+.desktop-card.card-solid {
+  background: var(--card-solid-bg, rgba(255,255,255,0.08));
+  border: 1px solid var(--card-solid-border, rgba(255,255,255,0.12));
+  box-shadow: var(--card-solid-shadow, 0 1px 4px rgba(0,0,0,0.03));
+}
+
+/* ─── 编辑模式标记 ─── */
+.desktop-card .card-edit-badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--card-edit-badge-bg, rgba(0,0,0,0.45));
+  color: #fff;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ★ 编辑模式下，卡片内所有子元素不拦截点击，确保整个卡片都能触发编辑面板 */
+.desktop-card-grid.editing .desktop-card > * {
+  pointer-events: none;
+}
+
+/* ─── 空槽位 ─── */
+.desktop-card.empty-slot {
+  background: transparent;
+  border: 1.5px dashed var(--card-empty-dash, rgba(143,175,191,0.4));
+  cursor: pointer;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.desktop-card.empty-slot:active {
+  background: rgba(143, 175, 191, 0.1);
+  transform: scale(0.96);
+}
+
+.empty-slot-plus {
+  font-size: 18px;
+  color: var(--card-empty-dash, rgba(143,175,191,0.45));
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* ═══════════════ App 快捷卡片 v2（图标 + 细线 + 浅色文字） ═══════════════ */
+
+.desktop-card.card-frosted:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.card-app-v2 {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px;
+  padding: 6px;
+}
+
+.app2-icon {
+  display: flex; align-items: center; justify-content: center;
+  opacity: var(--card-icon-opacity, 0.7);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.desktop-card:active .app2-icon {
+  opacity: 1;
+  transform: scale(0.92);
+}
+
+.app2-line {
+  width: 18px; height: 1px;
+  background: var(--card-app-line, rgba(143,175,191,0.35));
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.app2-label {
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--card-app-label, rgba(143,175,191,0.7));
+  letter-spacing: 0.4px;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ═══════════════ App 快捷卡片 v3（图标圆角方形 + 文字标签，磨砂玻璃底无边框） ═══════════════ */
+
+/* 卡片外框 — 去掉白底+白边，完全透明 */
+.desktop-card:has(.card-app-v3) {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.card-app-v3 {
+  width: 100%; height: 100%;
+  min-height: 70px;  /* ★ 防被 grid 压缩裁切 */
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px;
+  padding: 2px;
+}
+
+.app3-icon-container {
+  width: 100%;
+  max-width: 56px;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* 有自定义图片时：图标本身就是圆角方形，无额外阴影 */
+.app3-icon-container.has-custom {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.app3-icon-container.has-custom img {
+  border-radius: 14px;
+}
+
+.desktop-card:active .app3-icon-container {
+  transform: scale(0.85);
+}
+
+.app3-label {
+  font-size: 10px; font-weight: 500;
+  color: var(--card-app-label, #1A1A1A);
+  letter-spacing: 0.2px;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ═══════════════ CD 图标卡片 ═══════════════ */
+
+.card-cd-disc {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.card-cd-disc.spinning {
+  animation: cdSpin 4s linear infinite;
+}
+
+@keyframes cdSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ═══════════════ 数字时钟卡片 ═══════════════ */
+
+.card-clock-time {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--desktop-text-main);
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--card-clock-font, 'SF Mono','Roboto Mono','Menlo',monospace);
+}
+
+/* ═══════════════ 天气极简卡片 ═══════════════ */
+
+.card-weather-icon {
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  color: var(--desktop-text-main);
+}
+
+.card-weather-temp {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--desktop-text-main);
+}
+
+/* ═══════════════ 倒计时卡片（2026-08-16） ═══════════════ */
+
+.card-countdown {
+  position: relative;
+  height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px; text-align: center;
+  color: var(--desktop-text-main);
+  overflow: hidden;
+}
+.card-countdown .cd-title {
+  font-size: 11px; color: var(--desktop-text-aux);
+  max-width: 92%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.card-countdown .cd-days {
+  font-size: 26px; font-weight: 700; line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.card-countdown .cd-label { font-size: 10px; color: var(--desktop-text-aux); }
+.card-countdown .cd-date { font-size: 11px; color: var(--desktop-text-aux); margin-top: 3px; }
+.card-countdown .cd-empty { font-size: 11px; color: var(--desktop-text-aux); line-height: 1.6; }
+.card-countdown .cd-edit-btn {
+  position: absolute; top: 6px; right: 6px;
+  width: 20px; height: 20px; border-radius: 6px;
+  border: none; background: rgba(0,0,0,0.05);
+  color: var(--desktop-text-aux); font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.15s;
+}
+.card-countdown:hover .cd-edit-btn, .card-countdown:active .cd-edit-btn { opacity: 1; }
+
+/* 2×2 大字版 */
+.card-countdown.cd-big .cd-title { font-size: 14px; }
+.card-countdown.cd-big .cd-days { font-size: 48px; }
+.card-countdown.cd-big .cd-label { font-size: 12px; }
+
+/* ═══════════════ 小鲸鱼迷你卡片 ═══════════════ */
+
+.card-whale-body {
+  animation: whaleFloat 3s ease-in-out infinite;
+  position: relative;
+}
+
+@keyframes whaleFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+/* 水波涟漪 */
+.whale-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid var(--monet-deepwater, #5A8494);
+  animation: rippleOut 0.8s ease-out forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@keyframes rippleOut {
+  0%   { width: 0; height: 0; opacity: 0.6; }
+  100% { width: 80px; height: 80px; opacity: 0; margin-left: -40px; margin-top: -40px; }
+}
+
+/* ═══════════════ 纯图照片卡片 ═══════════════ */
+
+.card-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.card-photo-placeholder {
+  opacity: 0.25;
+}
+
+/* ═══════════════ 编辑按钮 ═══════════════ */
+
+.desktop-edit-btn {
+  position: absolute;
+  right: 18px;
+  bottom: 102px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+  color: var(--desktop-text-aux);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.desktop-edit-btn.active {
+  background: var(--monet-blue, #5A8494);
+  color: #fff;
+  border-color: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  width: auto;
+  padding: 0 12px;
+  border-radius: 17px;
+}
+
+.desktop-edit-btn:active {
+  transform: scale(0.92);
+}
+
+/* ═══════════════ 添加卡片面板 ═══════════════ */
+
+.add-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.add-card-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 6px;
+  border-radius: 14px;
+  background: rgba(143, 175, 191, 0.08);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+  border: 1px solid transparent;
+}
+
+.add-card-option:active {
+  transform: scale(0.94);
+  background: rgba(143, 175, 191, 0.18);
+  border-color: rgba(143, 175, 191, 0.25);
+}
+
+.add-card-option-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.add-card-option-name {
+  font-size: 11px;
+  color: var(--desktop-text-main);
+  font-weight: 400;
+  text-align: center;
+}
+
+/* ═══════════════ 暗色模式适配 ═══════════════ */
+/* ★ 卡片材质/文字颜色已全面 CSS 变量化，暗色模式由 phone.css 的变量覆盖自动处理 */
+
+html.dark-mode .card-app-icon {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+html.dark-mode .desktop-edit-btn {
+  background: rgba(30, 33, 42, 0.55);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+}
+
+html.dark-mode .desktop-edit-btn.active {
+  background: var(--monet-blue, #5A8494);
+  color: #fff;
+}
+
+html.dark-mode .add-card-option {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+html.dark-mode .add-card-option:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+html.dark-mode .add-card-option-name {
+  color: #e4e6ea;
+}
+
+/* 暗色模式 — 亚克力 CD 盒微调 */
+html.dark-mode .jc-insert-frame {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.06);
+}
+
+html.dark-mode .jc-bar {
+  background: rgba(255,255,255,0.08);
+}
+
+html.dark-mode .jc-placeholder {
+  stroke: rgba(255,255,255,0.2);
+}
+
+html.dark-mode .jc-clip {
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.04);
+}
+
+/* 暗色模式 — 唱片机 */
+html.dark-mode .crp2-disc-area {
+  background: rgba(0,0,0,0.15);
+}
+
+html.dark-mode .crp2-bar {
+  background: rgba(30,33,42,0.45);
+  border-top-color: rgba(255,255,255,0.06);
+}
+
+html.dark-mode .card-record-player-v3 {
+  background:
+    linear-gradient(145deg, rgba(38,43,54,0.84), rgba(28,32,42,0.62)),
+    radial-gradient(circle at 25% 16%, rgba(143,175,191,0.18), transparent 34%),
+    radial-gradient(circle at 84% 20%, rgba(232,180,184,0.12), transparent 32%);
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 22px rgba(0,0,0,0.26);
+}
+
+html.dark-mode .crp3-disc-wrap {
+  background: rgba(255,255,255,0.06);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+html.dark-mode .crp3-info {
+  background: rgba(22,25,33,0.48);
+  border-top-color: rgba(255,255,255,0.07);
+}
+
+html.dark-mode .crp3-status,
+html.dark-mode .crp3-controls button {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.68);
+}
+
+html.dark-mode .crp3-title {
+  color: rgba(255,255,255,0.9);
+}
+
+html.dark-mode .crp3-artist {
+  color: rgba(255,255,255,0.5);
+}
+
+html.dark-mode .crp3-progress {
+  background: rgba(255,255,255,0.1);
+}
+
+html.dark-mode .crp3-controls button.main {
+  background: rgba(255,255,255,0.88);
+  color: #111820;
+}
+
+/* 暗色模式 — 个人主页 v4 */
+html.dark-mode .cpf4-cover {
+  background: linear-gradient(135deg, #2a3040 0%, #242a38 50%, #2a3040 100%);
+}
+
+html.dark-mode .cpf4-cover-hint {
+  color: rgba(255,255,255,0.15);
+}
+
+html.dark-mode .cpf4-avatar {
+  background: rgba(30,33,42,0.55);
+  border-color: rgba(255,255,255,0.12);
+}
+
+html.dark-mode .app3-icon-container {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+html.dark-mode .app3-icon-container.has-custom {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+
+html.dark-mode .app3-label {
+  color: rgba(255,255,255,0.75);
+}
+
+/* ═══════════════ 添加面板尺寸标签 ═══════════════ */
+
+.add-card-option-size {
+  font-size: 9px;
+  color: var(--desktop-text-aux);
+  opacity: 0.5;
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════ 添加面板 · 统一高级简约样式 ═══════════════ */
+#appModal .modal-container {
+  padding: 18px 16px calc(16px + var(--sab, 0px));
+  background: var(--surface-card);
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-float-lg);
+}
+#appModal .modal-title {
+  margin-bottom: 16px;
+  color: var(--ink);
+  font-weight: var(--font-wt-bold);
+  letter-spacing: .4px;
+}
+#appModal .modal-body {
+  color: var(--ink-light);
+}
+.desktop-add-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  background: var(--surface-input);
+}
+.desktop-add-tab {
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-subtle);
+  font: inherit;
+  font-size: 12px;
+  font-weight: var(--font-wt-medium);
+  cursor: pointer;
+  transition: color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+.desktop-add-tab.active {
+  background: var(--surface-card);
+  color: var(--monet-deepwater);
+  box-shadow: var(--shadow-float-sm);
+  font-weight: var(--font-wt-bold);
+}
+.desktop-add-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  max-height: 46vh;
+  overflow-y: auto;
+  padding: 2px;
+}
+.desktop-size-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.desktop-add-grid .add-card-option {
+  min-height: 78px;
+  box-sizing: border-box;
+  padding: 11px 5px 9px;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  background: var(--surface-page);
+}
+.desktop-add-grid .add-card-option:hover {
+  border-color: rgba(110,145,159,.32);
+  background: var(--monet-ice);
+}
+.desktop-add-grid .add-card-option:active {
+  background: var(--monet-ice);
+  border-color: var(--monet-blue);
+  transform: scale(.97);
+}
+.desktop-add-grid .add-card-option[style*="opacity:0.4"] {
+  cursor: default;
+  filter: saturate(.35);
+}
+.desktop-add-grid .add-card-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--monet-deepwater) !important;
+}
+.desktop-add-grid .add-card-option-icon svg {
+  width: 23px;
+  height: 23px;
+}
+.desktop-add-grid .add-card-option-name {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desktop-add-grid .add-card-option-size {
+  color: var(--ink-subtle);
+}
+.desktop-add-location {
+  margin-top: 11px;
+  color: var(--ink-subtle);
+  font-size: 11px;
+  text-align: center;
+}
+
+@media (max-width: 360px) {
+  .desktop-add-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ═══════════════ 唱片机 2×2 v2 — 可换封面黑胶 + 磨砂底条 ═══════════════ */
+
+.card-record-player-v2 {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── 唱片 + 唱臂区域 ── */
+.crp2-disc-area {
+  flex: 1;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.12);
+}
+
+/* 黑胶唱片 */
+.crp2-disc {
+  width: min(72%, 102px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  position: absolute;
+  left: 30%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--card-music-disc-bg, #1a1a1a);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.28);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.crp2-disc.spinning {
+  animation: crp2Spin 3s linear infinite;
+}
+@keyframes crp2Spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* 默认黑胶纹理（无封面时） */
+.crp-disc-grooves {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #333 0%, #1a1a1a 8%, #2a2a2a 9%, #111 16%,
+    #2a2a2a 17%, #111 24%, #2a2a2a 25%, #111 32%,
+    #2a2a2a 33%, #111 40%, #2a2a2a 41%, #111 48%,
+    #2a2a2a 49%, #111 56%, #2a2a2a 57%, #111 64%,
+    #222 65%, #1a1a1a 100%
+  );
+}
+
+/* 默认中心标签 */
+.crp-disc-label {
+  position: absolute; z-index: 2;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: #c0392b;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.6);
+}
+
+/* 封面图 */
+.crp-cover-img {
+  position: absolute; z-index: 1;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* 中心孔 */
+.crp2-hole {
+  position: absolute; z-index: 3;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #888, #333);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4);
+  pointer-events: none;
+}
+
+/* 唱臂 */
+.crp2-arm {
+  position: absolute;
+  top: 6px; right: 16px;
+  width: 2.5px; height: 55%;
+  background: linear-gradient(180deg, #999 0%, #bbb 50%, #aaa 100%);
+  border-radius: 2px;
+  transform-origin: top center;
+  transform: rotate(22deg);
+  box-shadow: -1px 0 3px rgba(0,0,0,0.2);
+}
+/* 唱臂小圆头 */
+.crp2-arm::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: -3px;
+  width: 8px; height: 6px;
+  border-radius: 3px;
+  background: #bbb;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* ── 底部磨砂信息条 ── */
+.crp2-bar {
+  height: 26px;
+  display: flex; align-items: center;
+  padding: 0 8px;
+  gap: 3px;
+  background: var(--card-music-bar-bg, rgba(255,255,255,0.22));
+  backdrop-filter: blur(var(--card-music-bar-blur, 12px));
+  -webkit-backdrop-filter: blur(var(--card-music-bar-blur, 12px));
+  border-top: 1px solid rgba(255,255,255,0.25);
+  flex-shrink: 0;
+}
+
+.crp2-title {
+  font-size: 10px; font-weight: 300; font-style: italic;
+  color: var(--desktop-text-main);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+.crp2-sep {
+  font-size: 8px; color: var(--desktop-text-aux); opacity: 0.45; flex-shrink: 0;
+}
+
+.crp2-artist {
+  font-size: 9px; font-weight: 300; font-style: italic;
+  color: var(--desktop-text-aux);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 60px;
+}
+
+/* ═══════════════ 唱片机 2×2 v3 — Now Playing 小组件 ═══════════════ */
+
+.card-record-player-v3 {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.34), rgba(255,255,255,0.13)),
+    radial-gradient(circle at 25% 16%, rgba(143,175,191,0.28), transparent 34%),
+    radial-gradient(circle at 84% 20%, rgba(232,180,184,0.2), transparent 32%);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 64px;
+  border: 1px solid rgba(255,255,255,0.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 8px 20px rgba(35,50,60,0.08);
+}
+
+.crp3-glow {
+  position: absolute;
+  left: -18%;
+  top: -22%;
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: rgba(143,175,191,0.22);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.crp3-stage {
+  min-height: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px 4px;
+}
+
+.crp3-disc-wrap {
+  width: min(84%, 108px);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.38);
+}
+
+.crp3-disc {
+  width: 86%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  background: #17191f;
+  box-shadow: 0 9px 20px rgba(18,24,32,0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crp3-disc.spinning {
+  animation: crp3Spin 4.8s linear infinite;
+}
+
+@keyframes crp3Spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.crp3-cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.crp3-disc-grooves {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, #20242b 0 2px, #12151b 2px 4px),
+    radial-gradient(circle at 32% 24%, rgba(255,255,255,0.16), transparent 34%);
+}
+
+.crp3-disc-label {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #8FAFBF, #E8B4B8);
+  color: rgba(255,255,255,0.86);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.crp3-disc-rings {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: inset 0 0 0 8px rgba(0,0,0,0.08), inset 0 0 0 18px rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+
+.crp3-hole {
+  position: absolute;
+  z-index: 4;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%, #fff 0 2px, #d8e3e8 3px, #73818a 8px);
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.24), inset 0 1px 3px rgba(0,0,0,0.28);
+  pointer-events: none;
+}
+
+.crp3-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.34), transparent 34%, transparent 64%, rgba(255,255,255,0.12));
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.crp3-arm {
+  position: absolute;
+  right: 19px;
+  top: 13px;
+  width: 26px;
+  height: 54px;
+  transform-origin: 20px 8px;
+  transform: rotate(-18deg);
+  transition: transform 0.25s ease;
+}
+
+.crp3-arm.engaged {
+  transform: rotate(-4deg);
+}
+
+.crp3-arm::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(157,174,184,0.62));
+  box-shadow: 0 2px 7px rgba(0,0,0,0.16);
+}
+
+.crp3-arm span {
+  position: absolute;
+  right: 7px;
+  top: 12px;
+  width: 3px;
+  height: 42px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(104,118,128,0.72));
+  transform: rotate(21deg);
+  transform-origin: top center;
+}
+
+.crp3-arm span::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  bottom: -3px;
+  width: 12px;
+  height: 7px;
+  border-radius: 4px;
+  background: #59656f;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.crp3-status {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.4);
+  color: rgba(74,93,104,0.72);
+  font-size: 8px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.card-record-player-v3.is-playing .crp3-status {
+  color: #fff;
+  background: rgba(90,132,148,0.72);
+}
+
+.crp3-info {
+  min-width: 0;
+  padding: 7px 10px 8px;
+  background: rgba(255,255,255,0.38);
+  border-top: 1px solid rgba(255,255,255,0.36);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.crp3-title,
+.crp3-artist {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0;
+}
+
+.crp3-title {
+  color: var(--desktop-text-main, #182026);
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.crp3-artist {
+  margin-top: 1px;
+  color: var(--desktop-text-aux, rgba(24,32,38,0.58));
+  font-size: 9px;
+  line-height: 1.15;
+  font-weight: 500;
+}
+
+.crp3-progress {
+  height: 3px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.25);
+}
+
+.crp3-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(255,255,255,0.85), rgba(255,255,255,0.55));
+  transition: width 0.25s ease;
+}
+
+.crp3-controls {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.crp3-controls button {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.42);
+  color: rgba(52,68,78,0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+
+.crp3-controls button:active {
+  transform: scale(0.9);
+}
+
+.crp3-controls button.main {
+  background: rgba(255,255,255,0.72);
+  color: #3D4F5C;
+  box-shadow: 0 3px 8px rgba(90,132,148,0.24);
+}
+
+.crp3-controls svg {
+  width: 12px;
+  height: 12px;
+}
+
+.crp3-controls button:not(.main) svg {
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.crp3-controls button.main svg {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* ═══════════════ 时钟 2×2 / 2×4 v2 — 横版 ═══════════════ */
+
+.card-clock-v2 {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+  padding: 8px 12px;
+}
+
+/* 2×4 宽版：时间行横排 */
+.clock2-time-row {
+  display: flex; align-items: baseline;
+  gap: 2px;
+}
+
+.clock2-time {
+  font-size: clamp(24px, 10vw, 40px); font-weight: 600;
+  color: var(--desktop-text-main);
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--card-clock-font, 'SF Mono','Roboto Mono','Menlo',monospace);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.clock2-sec {
+  font-size: 16px; font-weight: 400;
+  color: var(--desktop-text-aux);
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--card-clock-font, 'SF Mono','Roboto Mono','Menlo',monospace);
+  letter-spacing: 0.5px;
+  margin-left: 2px;
+}
+
+/* 上下午标识 — 与日期同字号 */
+.clock2-ampm {
+  font-size: 12px; font-weight: 400;
+  color: var(--desktop-text-aux);
+  letter-spacing: 0.5px;
+  margin-left: 6px;
+  font-variant-numeric: normal;
+  font-family: var(--font-family, system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif);
+}
+
+.clock2-date {
+  font-size: 12px; font-weight: 400;
+  color: var(--desktop-text-aux);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* ═══════════════ 完整鲸鱼 2×2 ═══════════════ */
+
+.card-whale-bubble {
+  font-size: 11px;
+  color: var(--desktop-text-aux);
+  background: var(--card-whale-bubble-bg, rgba(255,255,255,0.4));
+  padding: 3px 8px;
+  border-radius: 8px;
+  margin-top: 2px;
+  max-width: 90%;
+  text-align: center;
+  transition: opacity 0.3s;
+}
+
+/* ═══════════════ 便签 2×2 ═══════════════ */
+
+.card-note-wrap {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 14px;
+}
+
+.card-note-upper {
+  font-size: 13px;
+  font-weight: 300;
+  font-family: var(--font-family, system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif);
+  color: var(--card-note-color, var(--desktop-text-aux));
+  text-align: left;
+  align-self: flex-start;
+  margin-bottom: 6px;
+}
+
+.card-note-lower {
+  font-size: 13px;
+  font-weight: 300;
+  font-family: var(--font-family, system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif);
+  color: var(--card-note-color, var(--desktop-text-aux));
+  text-align: right;
+  align-self: flex-end;
+}
+
+.card-note-double {
+  font-size: 13px;
+  font-weight: 300;
+  font-family: var(--font-family, system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif);
+  color: var(--card-note-color, var(--desktop-text-aux));
+  text-align: center;
+}
+
+/* ═══════════════ 天气详情 3×4 v2 ═══════════════ */
+
+.card-weather-detail-v2 {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  padding: 10px 12px;
+  gap: 2px;
+}
+
+/* 顶部时间 */
+.cwd2-time {
+  font-size: clamp(18px, 7vw, 26px); font-weight: 600; text-align: center;
+  color: var(--desktop-text-main); letter-spacing: 1.5px;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--card-clock-font, 'SF Mono','Roboto Mono','Menlo',monospace);
+  line-height: 1.1;
+}
+
+.cwd2-date {
+  font-size: 11px; text-align: center;
+  color: var(--desktop-text-aux); letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+/* 天气主体：信息居左 + 图标居右 */
+.cwd2-main {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: 10px; padding: 0 4px;
+  flex: 1;
+}
+
+.cwd2-icon {
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--desktop-text-main);
+}
+.cwd2-icon svg {
+  width: 48px; height: 48px;  /* 原 22px → 48px，约 2.2× */
+}
+
+.cwd2-info {
+  display: flex; flex-direction: column;
+  align-items: flex-start;  /* 居左 */
+  gap: 1px;
+  text-align: left;
+}
+
+.cwd2-city {
+  font-size: 13px; font-weight: 500;
+  color: var(--desktop-text-main);
+}
+
+.cwd2-temp {
+  font-size: clamp(22px, 9vw, 34px); font-weight: 600;
+  color: var(--desktop-text-main);
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.cwd2-desc {
+  font-size: 12px;
+  color: var(--desktop-text-aux);
+}
+
+/* 底部四天预报 */
+.cwd2-forecast {
+  display: flex; justify-content: space-around;
+  padding-top: 6px;
+  border-top: 1px solid rgba(143,175,191,0.12);
+  flex-shrink: 0;
+}
+
+.cwd2-fc-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+  font-size: 10px;
+  color: var(--desktop-text-aux);
+  line-height: 1.5;
+}
+
+/* ═══════════════ 相册胶囊 4×3 竖版 ═══════════════ */
+
+.card-album-wrap-v {
+  width: 100%; height: 100%;
+  border-radius: 18px;
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+
+.calb-header-v {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.calb-date-v {
+  font-size: 12px; font-weight: 500; color: var(--desktop-text-main);
+  line-height: 1.3;
+}
+
+.calb-title-v {
+  font-size: 13px; font-weight: 500; color: var(--desktop-text-main);
+  letter-spacing: 0.5px;
+}
+
+.calb-title-sub {
+  font-size: 12px; color: var(--desktop-text-aux);
+  margin-left: 6px;
+  font-weight: 400;
+}
+
+.calb-capsules-v {
+  flex: 1; display: flex;
+  gap: 10px; overflow: hidden;
+  align-items: stretch;
+}
+
+.calb-capsule-v {
+  flex: 1;
+  border-radius: 999px;
+  border: 1.5px dashed rgba(143,175,191,0.3);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  min-width: 36px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.calb-capsule-v.calb-high {
+  align-self: flex-start;
+  height: 100%;
+}
+
+.calb-capsule-v.calb-low {
+  align-self: flex-end;
+  height: 72%;
+}
+
+.calb-capsule-v:active {
+  border-color: rgba(143,175,191,0.6);
+  transform: scale(0.95);
+}
+
+.calb-capsule-img-v {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 999px;
+}
+
+.calb-capsule-plus-v {
+  font-size: 18px; color: rgba(143,175,191,0.35);
+  font-weight: 300;
+}
+
+/* ═══════════════ 拍立得 3×5 ═══════════════ */
+
+.card-polaroid-wrap {
+  width: 100%; height: 100%;
+  background: #FDFAF7;
+  border-radius: 4px;
+  padding: 8px 8px 28px 8px;
+  display: flex; flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.cpld-frame {
+  flex: 1;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: #FDFAF7;
+  border-radius: 1px;
+}
+
+.cpld-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.cpld-caption {
+  height: 28px;
+  display: flex; align-items: flex-end; justify-content: center;
+  font-size: 12px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  color: #2c2c2c;
+  letter-spacing: 0.6px;
+  padding-bottom: 4px;
+}
+
+/* ═══════════════ CD 盒子 4×2 — 亚克力 Jewel Case ═══════════════ */
+
+.jewelcase-inner {
+  width: 100%; height: 100%;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+/* ── 左：插页卡片 ── */
+.jc-left {
+  flex: 0 0 50%;
+  position: relative;
+  cursor: pointer;
+  border-right: 1px solid rgba(0,0,0,0.05);
+}
+
+.jc-insert-frame {
+  position: absolute;
+  inset: 3px;
+  border: 1.5px solid rgba(0,0,0,0.07);
+  border-radius: 1px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.3);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+}
+
+.jc-insert-art {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.jc-insert-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.jc-placeholder {
+  stroke: rgba(72,102,116,0.2);
+  fill: none;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 插页四角透明卡扣 */
+.jc-clip {
+  position: absolute;
+  width: 7px; height: 7px;
+  border-radius: 1px;
+  border: 1px solid rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.08);
+  z-index: 3;
+  pointer-events: none;
+}
+.jc-clip-tl { top: 4px; left: 4px; border-right: none; border-bottom: none; }
+.jc-clip-tr { top: 4px; right: 4px; border-left: none; border-bottom: none; }
+.jc-clip-bl { bottom: 4px; left: 4px; border-right: none; border-top: none; }
+.jc-clip-br { bottom: 4px; right: 4px; border-left: none; border-top: none; }
+
+/* ── 中轴铰链 ── */
+.jc-spine {
+  flex: 0 0 4px;
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0.05),
+    rgba(0,0,0,0.08) 20%,
+    rgba(255,255,255,0.18) 40%,
+    rgba(255,255,255,0.25) 50%,
+    rgba(255,255,255,0.18) 60%,
+    rgba(0,0,0,0.08) 80%,
+    rgba(0,0,0,0.05)
+  );
+  box-shadow: -1px 0 1px rgba(0,0,0,0.04), 1px 0 1px rgba(255,255,255,0.25);
+}
+
+/* ── 右：CD 托盘 ── */
+.jc-right {
+  flex: 0 0 calc(50% - 4px);
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.jc-tray-frame {
+  position: absolute;
+  inset: 3px;
+  border-radius: 1px;
+  background: #2a2d32;
+  border: 2px solid rgba(0,0,0,0.12);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08), inset 0 1px 3px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.jc-tray-bg {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.jc-tray-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+}
+
+/* 托盘中心凸起 */
+.jc-tray-hub {
+  position: absolute;
+  width: 14%; aspect-ratio: 1;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  margin-left: -7%; margin-top: -7%;
+  z-index: 1;
+  background: radial-gradient(circle, #3a3e44 0%, #2a2d32 100%);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3), inset 0 0 0 2px rgba(0,0,0,0.15);
+  pointer-events: none;
+}
+
+/* ── CD 碟片 ── */
+.jc-disc {
+  position: absolute;
+  width: 72%; aspect-ratio: 1;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  margin-left: -36%; margin-top: -36%;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,255,255,0.04);
+  transition: transform 0.15s;
+}
+.jc-disc:active { transform: scale(0.97); }
+.jc-disc.spinning {
+  animation: jcSpin 4s linear infinite;
+}
+@keyframes jcSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* CD 碟面金属底 */
+.jc-disc-surface {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  z-index: 0;
+  background: radial-gradient(
+    circle,
+    #f2f2f2 0%, #e0e0e0 12%, #ececec 13%,
+    #d4d4d4 28%, #e2e2e2 29%, #ececec 46%,
+    #d8d8d8 70%, #c8c8c8 88%, #b8b8b8 100%
+  );
+}
+
+/* CD 标签（封面） */
+.jc-disc-art {
+  position: absolute;
+  inset: 16%;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1;
+  background: #e8e8e8;
+}
+
+.jc-disc-art-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* CD 中心孔 */
+.jc-disc-hole {
+  position: absolute;
+  width: 10%; aspect-ratio: 1;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  margin-left: -5%; margin-top: -5%;
+  z-index: 3;
+  background: radial-gradient(circle at 40% 35%, #555, #222);
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,0.5);
+}
+
+/* CD 表面光泽 */
+.jc-disc-shine {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 28% 22%, rgba(255,255,255,0.2) 0%, transparent 50%);
+}
+
+/* ── 底部信息条 ── */
+.jc-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 20px;
+  display: flex; align-items: center;
+  padding: 0 6px;
+  background: rgba(255,255,255,0.18);
+  gap: 3px;
+}
+
+.jc-bar-info {
+  display: flex; align-items: baseline;
+  gap: 3px; min-width: 0; overflow: hidden;
+}
+
+.jc-bar-title {
+  font-size: 10px; font-weight: 300; font-style: italic;
+  color: var(--desktop-text-main);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 90px;
+}
+
+.jc-bar-sep {
+  font-size: 8px; color: var(--desktop-text-aux); opacity: 0.45; flex-shrink: 0;
+}
+
+.jc-bar-artist {
+  font-size: 9px; font-weight: 300; font-style: italic;
+  color: var(--desktop-text-aux);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 70px;
+}
+
+/* ═══════════════ 个人主页 4×4 v4 — 封面+大头像+点赞 ═══════════════ */
+
+.card-profile-wrap-v4 {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* ── 上半部：封面背景 ── */
+.cpf4-cover {
+  height: 50%;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #e0e8f0 0%, #d0dce8 50%, #dce4f0 100%);
+  flex-shrink: 0;
+}
+
+.cpf4-bg-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.cpf4-bg-empty {
+  width: 100%; height: 100%;
+}
+
+.cpf4-cover-hint {
+  position: absolute;
+  font-size: 11px; color: rgba(72,102,116,0.25);
+  pointer-events: none;
+}
+
+/* ── 下半部 ── */
+.cpf4-bottom {
+  height: 50%;
+  display: flex; align-items: center;
+  padding: 0 10px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* 大头像（左下，大半压住分割线） */
+.cpf4-avatar {
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 2.5px solid rgba(255,255,255,0.6);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  margin-top: -38px; /* 大半压入上半部，靠近中线 */
+  z-index: 2;
+}
+
+.cpf4-avatar-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.cpf4-avatar-emoji {
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 信息（右移） */
+.cpf4-meta {
+  display: flex; flex-direction: column;
+  gap: 1px;
+  margin-left: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cpf4-name {
+  font-size: 15px; font-weight: 600;
+  color: var(--desktop-text-main);
+  line-height: 1.3;
+}
+
+.cpf4-id {
+  font-size: 10px; color: var(--desktop-text-aux);
+  opacity: 0.65;
+  font-family: var(--card-clock-font, 'SF Mono','Roboto Mono','Menlo',monospace);
+  letter-spacing: 0.3px;
+}
+
+.cpf4-bio {
+  font-size: 11px; color: var(--desktop-text-aux);
+  opacity: 0.7;
+  line-height: 1.3;
+}
+
+.cpf4-loc {
+  font-size: 10px; color: var(--desktop-text-aux);
+  opacity: 0.55;
+}
+
+/* 点赞按钮（最右） */
+.cpf4-like {
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--desktop-text-aux);
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.cpf4-like:active {
+  transform: scale(1.15);
+  opacity: 1;
+}
+
+.cpf4-like-count {
+  font-size: 10px; font-weight: 500;
+  color: var(--desktop-text-aux);
+}
+
+.cpf4-like-count.liked {
+  animation: likePop 0.3s ease;
+}
+
+@keyframes likePop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.4); color: #e74c3c; }
+  100% { transform: scale(1); }
+}

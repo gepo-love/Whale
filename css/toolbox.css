@@ -1,0 +1,384 @@
+/**
+ * 小手机 — 工具箱样式
+ * 莫奈印象派 · 工具卡片网格 + 工具运行页
+ */
+
+/* ─── 工具箱页面容器 ─── */
+.toolbox-content {
+  flex:1; overflow-y:auto; padding:12px 16px;
+  display:flex; flex-direction:column; gap:14px;
+}
+
+/* ─── 顶部操作栏 ─── */
+.toolbox-actions {
+  display:flex; gap:8px; align-items:center;
+}
+.toolbox-actions .form-btn {
+  flex:1; padding:6px 10px; border-radius:var(--radius-md);
+  border:0.5px solid var(--border-light); background:var(--surface-card);
+  color:var(--ink); font-size:12px; font-weight:var(--font-wt-light);
+  letter-spacing:var(--letter-spacing); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:4px;
+  transition:all 0.2s;
+}
+.toolbox-actions .form-btn:active {
+  background:var(--surface-page); transform:scale(0.98);
+}
+.toolbox-actions .form-btn.primary {
+  background:var(--monet-blue); color:#fff; border-color:var(--monet-blue);
+  font-weight:var(--font-wt-normal);
+}
+
+/* ─── 工具卡片网格 ─── */
+.toolbox-grid {
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:12px;
+}
+
+.tool-card {
+  background:var(--surface-card);
+  border-radius:var(--radius-md);
+  border:0.5px solid var(--border-light);
+  box-shadow:var(--shadow-card);
+  padding:16px;
+  cursor:pointer;
+  transition:transform 0.2s, box-shadow 0.2s;
+  display:flex; flex-direction:column; gap:10px;
+  min-height:140px;
+}
+.tool-card:active {
+  transform:scale(0.96);
+  box-shadow:var(--shadow-card-hover);
+}
+
+.tool-card-icon {
+  font-size:32px; line-height:1;
+}
+.tool-card-name {
+  font-size:15px; font-weight:var(--font-wt-normal);
+  color:var(--ink); letter-spacing:1px;
+}
+.tool-card-desc {
+  font-size:12px; color:var(--ink-light);
+  font-weight:var(--font-wt-light); letter-spacing:0.5px;
+  line-height:1.4; display:-webkit-box; -webkit-line-clamp:2;
+  -webkit-box-orient:vertical; overflow:hidden;
+  flex:1;
+}
+.tool-card-meta {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:11px; color:var(--ink-subtle); letter-spacing:0.5px;
+}
+.tool-card-delete {
+  opacity:0.55; transition:opacity 0.2s;
+  background:none; border:none; color:#EF4444;
+  font-size:16px; cursor:pointer; padding:2px 6px;
+}
+.tool-card:hover .tool-card-delete,
+.tool-card:active .tool-card-delete { opacity:1; }
+
+/* ─── 空状态 ─── */
+.toolbox-empty {
+  text-align:center; padding:40px 20px;
+}
+.toolbox-empty .empty-icon {
+  font-size:48px; margin-bottom:12px; opacity:0.6;
+}
+.toolbox-empty .empty-text {
+  font-size:14px; color:var(--ink-light);
+  font-weight:var(--font-wt-light); letter-spacing:1px;
+  margin-bottom:16px;
+}
+.toolbox-empty .empty-hint {
+  font-size:12px; color:var(--ink-subtle);
+  font-weight:var(--font-wt-regular); letter-spacing:0.5px;
+  line-height:1.6;
+}
+
+/* ─── 工具创建/编辑弹窗 ─── */
+.tool-form-group {
+  margin-bottom:12px;
+}
+.tool-form-label {
+  font-size:13px; color:var(--ink-light);
+  font-weight:var(--font-wt-light); letter-spacing:1px;
+  margin-bottom:4px; display:block;
+}
+.tool-form-input {
+  width:100%; padding:10px 12px; border-radius:var(--radius-sm);
+  border:0.5px solid var(--border-light);
+  background:var(--surface-input); color:var(--ink);
+  font-size:14px; font-family:var(--font);
+  letter-spacing:var(--letter-spacing);
+  box-sizing:border-box;
+}
+.tool-form-textarea {
+  min-height:200px; resize:vertical;
+  font-family:'SF Mono','Consolas','Courier New',monospace;
+  font-size:12px; letter-spacing:0; line-height:1.5;
+}
+
+/* ─── 工具运行页（全屏 iframe） ─── */
+.tool-runner-bar {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 12px; border-bottom:0.5px solid var(--border-light);
+  background:var(--surface-card); flex-shrink:0;
+}
+.tool-runner-select {
+  flex:1; padding:6px 10px; border-radius:var(--radius-sm);
+  border:0.5px solid var(--border-light);
+  background:var(--surface-input); color:var(--ink);
+  font-size:13px; font-family:var(--font);
+  letter-spacing:var(--letter-spacing);
+}
+#toolRunnerPage.page.active {
+  display:flex; flex-direction:column;
+  overflow:hidden; /* 由内部 iframe 处理滚动 */
+}
+.tool-runner {
+  flex:1; display:flex; flex-direction:column;
+  background:#fff; min-height:0; overflow:hidden;
+}
+.tool-runner iframe {
+  flex:1; width:100%; border:none; min-height:0;
+  -webkit-overflow-scrolling:touch; /* iOS 平滑滚动 */
+}
+
+/* ─── ★ 2026-09-03 应用商店 App 全屏沉浸模式（无外壳，整屏运行） ─── */
+body.app-runner-fullscreen #toolRunnerPage .nav-bar,
+body.app-runner-fullscreen #toolRunnerPage .tool-runner-bar {
+  display:none;
+}
+body.app-runner-fullscreen #toolRunnerPage .tool-runner {
+  position:fixed; inset:0; z-index:9000; margin:0;
+}
+.app-fullscreen-exit {
+  display:none;
+  position:fixed; top:14px; right:14px; z-index:9999;
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(0,0,0,.35); color:#fff; border:none;
+  font-size:24px; line-height:1; align-items:center; justify-content:center;
+  cursor:pointer; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+}
+body.app-runner-fullscreen .app-fullscreen-exit {
+  display:flex;
+}
+/* ★ 2026-09-03 全屏 App 角色按钮（互动型 App 选角色用） */
+.app-fullscreen-role {
+  display:none;
+  position:fixed; top:14px; right:60px; z-index:9999;
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(0,0,0,.35); color:#fff; border:none;
+  font-size:19px; line-height:1; align-items:center; justify-content:center;
+  cursor:pointer; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+  overflow:hidden;
+}
+body.app-runner-fullscreen .app-fullscreen-role {
+  display:flex;
+}
+
+/* ─── 聊天中的工具卡片（替换裸代码） ─── */
+.tool-chat-card {
+  background: var(--surface-card);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 0.5px solid var(--border-light);
+}
+.tool-chat-preview {
+  background: #fff;
+}
+.tool-chat-actions {
+  display: flex; gap: 8px;
+  padding: 8px 10px;
+  background: var(--surface-input);
+}
+.tool-chat-btn {
+  flex: 1; padding: 8px 0;
+  border-radius: 10px; border: none;
+  font-size: 13px; font-weight: 300;
+  letter-spacing: 1px; cursor: pointer;
+  transition: all 0.15s;
+}
+.tool-chat-btn.preview-btn {
+  background: var(--surface-card);
+  color: var(--ink);
+  border: 0.5px solid var(--border-light);
+}
+.tool-chat-btn.save-btn {
+  background: var(--monet-blue);
+  color: #fff;
+}
+.tool-chat-btn:active { transform: scale(0.96); opacity: 0.85; }
+
+/* ─── 消息中的"保存到工具箱"按钮（旧版兼容） ─── */
+.save-to-toolbox-btn {
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  width:100%; padding:10px 16px; margin-top:10px;
+  border-radius:14px; border:none;
+  background: linear-gradient(135deg, rgba(123,165,184,0.15), rgba(168,184,160,0.12));
+  color: var(--monet-blue); font-size:14px;
+  font-weight: 400; cursor:pointer;
+  letter-spacing:1.5px;
+  transition:all 0.2s;
+  box-shadow: 0 1px 3px rgba(123,165,184,0.08);
+}
+.save-to-toolbox-btn:active {
+  background: rgba(123,165,184,0.25);
+  transform:scale(0.98);
+}
+.save-to-toolbox-btn::before {
+  content: '📦';
+  font-size: 16px;
+}
+
+/* 代码块内嵌预览卡片 */
+.tool-preview-card {
+  margin-top:8px; border-radius:14px; overflow:hidden;
+  border:1px solid var(--border-light);
+  background: #fff;
+}
+.tool-preview-card iframe {
+  width:100%; height:200px; border:none;
+  pointer-events:none; /* 预览不可交互 */
+}
+
+/* ─── 图标选择器 ─── */
+.icon-picker {
+  display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;
+}
+.icon-picker-item {
+  width:36px; height:36px; border-radius:var(--radius-sm);
+  border:0.5px solid var(--border-light);
+  background:var(--surface-input);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; cursor:pointer;
+  transition:all 0.2s;
+}
+.icon-picker-item.selected {
+  border-color:var(--monet-blue);
+  background:rgba(123,165,184,0.12);
+  box-shadow:0 0 0 2px rgba(123,165,184,0.2);
+}
+
+/* ─── 角色筛选栏 ─── */
+.tool-filter-bar {
+  display:flex; flex-wrap:wrap; gap:6px;
+  padding:0 0 4px; overflow-x:auto;
+}
+.tool-filter-chip {
+  padding:5px 12px; border-radius:20px;
+  border:0.5px solid var(--border-light);
+  background:var(--surface-card);
+  color:var(--ink-light); font-size:12px;
+  font-weight:var(--font-wt-light); cursor:pointer;
+  letter-spacing:0.5px; white-space:nowrap;
+  transition:all 0.2s;
+}
+.tool-filter-chip.active {
+  background:var(--monet-blue); color:#fff;
+  border-color:var(--monet-blue);
+  font-weight:var(--font-wt-normal);
+}
+
+/* ─── 工具卡片角色标签 ─── */
+.tool-friend-badge {
+  display:inline-block; padding:2px 6px; border-radius:6px;
+  font-size:10px; background:rgba(123,165,184,0.12);
+  color:var(--monet-deepwater); letter-spacing:0.5px;
+}
+.tool-global-badge {
+  display:inline-block; padding:2px 6px; border-radius:6px;
+  font-size:10px; background:rgba(0,0,0,0.04);
+  color:var(--ink-subtle); letter-spacing:0.5px;
+}
+
+/* ─── 角色设置页 · 专属工具列表 ─── */
+.char-tool-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 16px; cursor:pointer;
+  border-radius:var(--radius-sm);
+  transition:background 0.15s;
+}
+.char-tool-item:active { background:var(--surface-page); }
+.char-tool-icon { font-size:22px; flex-shrink:0; }
+.char-tool-info { flex:1; min-width:0; }
+.char-tool-name {
+  font-size:14px; color:var(--ink);
+  font-weight:var(--font-wt-normal); letter-spacing:1px;
+}
+.char-tool-desc {
+  font-size:11px; color:var(--ink-subtle);
+  letter-spacing:0.5px; overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* ─── 响应式 ─── */
+@media (min-width:420px) {
+  .toolbox-grid { grid-template-columns:repeat(3, 1fr); }
+}
+
+/* ─── 工具箱 → 角色互动 ─── */
+
+/* 发送按钮（工具运行页工具栏） */
+.tool-send-btn {
+  padding:6px 12px;
+  border-radius:18px;
+  border:1px solid var(--monet-blue);
+  background:var(--surface-card);
+  color:var(--monet-blue);
+  font-size:12px; font-weight:var(--font-wt-medium);
+  cursor:pointer; white-space:nowrap;
+  letter-spacing:0.5px;
+  transition:all 0.15s;
+  margin-left:auto;
+  flex-shrink:0;
+}
+.tool-send-btn:active {
+  background:var(--monet-paleblue);
+  transform:scale(0.96);
+}
+
+/* ─── 同步到聊天开关 ─── */
+.tool-sync-toggle {
+  display:flex; align-items:center; gap:2px;
+  cursor:pointer; flex-shrink:0;
+  padding:4px 8px; border-radius:16px;
+  border:1px solid transparent;
+  transition:all 0.15s;
+  user-select:none; -webkit-user-select:none;
+}
+.tool-sync-toggle:hover { border-color:var(--border-light); }
+.tool-sync-toggle input[type=checkbox] {
+  display:none;
+}
+.tool-sync-toggle span {
+  font-size:14px; opacity:0.5;
+  transition:opacity 0.15s;
+}
+.tool-sync-toggle:has(input:checked) span {
+  opacity:1;
+}
+.tool-sync-toggle:has(input:not(:checked)) {
+  background:rgba(0,0,0,0.04);
+}
+
+/* 工具结果卡片（聊天中的系统消息） */
+.tool-result-card {
+  background:linear-gradient(135deg, #f0f4f8, #e8eff4);
+  border:1px dashed var(--monet-lightblue);
+  border-radius:12px;
+  padding:10px 14px;
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  margin:4px 0;
+  font-size:13px;
+  line-height:1.5;
+}
+.tool-result-icon {
+  font-size:18px; flex-shrink:0; line-height:1.4;
+}
+.tool-result-text {
+  color:var(--ink); white-space:pre-wrap; overflow-wrap: break-word; word-break: normal;
+}

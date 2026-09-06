@@ -1,0 +1,622 @@
+/* ═══════════════ 群消息卡片样式 ═══════════════ */
+
+/* ─── 群红包卡片 ──────────────────────────────── */
+
+.redpacket-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FAD04E 0%, #F5A623 100%);
+  color: #fff;
+  cursor: pointer;
+  max-width: 300px;
+  min-width: 240px;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(245, 166, 35, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.redpacket-card:active {
+  transform: scale(0.97);
+}
+
+.redpacket-card.rp-finished {
+  background: linear-gradient(135deg, #c0c0c0 0%, #999 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.redpacket-card.rp-claimed {
+  background: linear-gradient(135deg, #e8c97a 0%, #d4a453 100%);
+  opacity: 0.85;
+}
+
+.redpacket-card .rp-left {
+  flex-shrink: 0;
+}
+
+.redpacket-card .rp-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.redpacket-card .rp-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.redpacket-card .rp-label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.rp-finished .rp-label,
+.rp-claimed .rp-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.redpacket-card .rp-greeting {
+  font-size: 11px;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 4px;
+}
+
+.redpacket-card .rp-progress {
+  font-size: 10px;
+  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.redpacket-card .rp-right {
+  flex-shrink: 0;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.rp-status-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rp-status-badge.open {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.rp-status-badge.claimed {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rp-status-badge.finished {
+  background: rgba(0, 0, 0, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.rp-my-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.rp-luckiest {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 2px;
+}
+
+/* 过期红包占位 */
+.redpacket-card.rp-expired {
+  background: linear-gradient(135deg, #e0e0e0 0%, #ccc 100%);
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+/* ─── 红包详情弹窗 ──────────────────────────────── */
+
+.rp-detail-popup {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.rp-detail-greeting {
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.rp-detail-total {
+  font-size: 12px;
+  color: var(--ink-subtle);
+  margin-bottom: 8px;
+}
+
+.rp-detail-progress {
+  font-size: 12px;
+  color: var(--ink-subtle);
+  margin-bottom: 8px;
+}
+
+.rp-detail-mine {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--monet-green);
+  margin: 8px 0;
+}
+
+.rp-result-amount {
+  font-size: 36px;
+  font-weight: 700;
+  color: #F5A623;
+  margin: 4px 0;
+}
+
+.rp-detail-claims {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-top: 10px;
+  text-align: left;
+  border-top: 1px solid var(--hairline, rgba(0,0,0,0.06));
+  padding-top: 8px;
+}
+
+.rp-claim-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 4px;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+.rp-claim-item.luckiest {
+  background: rgba(250, 208, 78, 0.15);
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+
+.rp-claim-name {
+  color: var(--ink);
+  flex-shrink: 0;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rp-claim-cents {
+  color: var(--monet-orange, #F5A623);
+  font-weight: 600;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.rp-claim-time {
+  color: var(--ink-subtle);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+/* ─── 代付卡片 ──────────────────────────────── */
+
+.pay-request-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--hairline, rgba(0,0,0,0.08));
+  max-width: 300px;
+  min-width: 240px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.pay-request-card:active {
+  transform: scale(0.97);
+}
+
+.pay-request-card.pr-paid {
+  opacity: 0.6;
+  background: #f8f8f8;
+}
+
+.pay-request-card .pr-left {
+  flex-shrink: 0;
+}
+
+.pay-request-card .pr-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.pay-request-card .pr-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pay-request-card .pr-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pay-request-card .pr-item {
+  font-size: 12px;
+  color: var(--ink-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.pay-request-card .pr-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FF6B3D;
+}
+
+.pay-request-card .pr-payer {
+  font-size: 10px;
+  color: var(--monet-green);
+  margin-top: 2px;
+}
+
+.pay-request-card .pr-right {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.pr-status {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pr-status.open {
+  background: #FF6B3D;
+  color: #fff;
+}
+
+.pr-status.waiting {
+  background: #f0f0f0;
+  color: var(--ink-subtle);
+}
+
+.pr-status.paid {
+  background: var(--monet-green);
+  color: #fff;
+}
+
+/* ─── 代付详情弹窗 ──────────────────────────────── */
+
+.pr-detail-popup {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.pr-detail-label {
+  font-size: 14px;
+  color: var(--ink-subtle);
+  margin-bottom: 4px;
+}
+
+.pr-detail-item {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.pr-detail-amount {
+  font-size: 28px;
+  font-weight: 700;
+  color: #FF6B3D;
+  margin-bottom: 8px;
+}
+
+.pr-detail-from,
+.pr-detail-status,
+.pr-detail-payer,
+.pr-detail-msg {
+  font-size: 12px;
+  color: var(--ink-subtle);
+  margin-bottom: 2px;
+}
+
+/* ─── 群成员身份 Badge ──────────────────────────────── */
+
+.group-role-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 500;
+  line-height: 1.5;
+  vertical-align: middle;
+  margin-left: 4px;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+.group-role-badge.owner {
+  background: #FAD04E;
+  color: #8B6914;
+  font-weight: 600;
+}
+
+.group-role-badge.admin {
+  background: #E8F0FE;
+  color: #1A73E8;
+}
+
+.group-role-badge.me {
+  background: #DCFCE7;
+  color: #166534;
+  font-weight: 600;
+}
+
+.group-role-badge.muted {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+/* 兼容旧 group-title-badge */
+.group-title-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 500;
+  line-height: 1.5;
+  vertical-align: middle;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.group-title-badge.owner {
+  background: #FAD04E;
+  color: #8B6914;
+  font-weight: 600;
+}
+
+.group-title-badge.admin {
+  background: #E8F0FE;
+  color: #1A73E8;
+}
+
+.group-title-badge.muted {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.group-title-badge.me {
+  background: #DCFCE7;
+  color: #166534;
+  font-weight: 600;
+}
+
+/* 角色扮演群不暴露 AI 身份。兼容旧 bundle 已渲染出的 AI badge。 */
+.group-role-badge.ai,
+.group-title-badge.ai {
+  display: none !important;
+}
+
+/* 群发言人信息行 */
+.group-speaker-line {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 3px;
+  flex-wrap: wrap;
+}
+
+.group-speaker-name {
+  font-size: 12px;
+  color: var(--ink-subtle);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ─── 群成员管理面板 ──────────────────────────────── */
+
+.gm-header-info {
+  font-size: 11px;
+  color: var(--ink-subtle);
+  text-align: center;
+  padding: 4px 0 8px;
+  border-bottom: 1px solid var(--hairline, rgba(0,0,0,0.06));
+  margin-bottom: 8px;
+}
+
+.gm-member-list {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.gm-member-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.gm-member-avatar {
+  font-size: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gm-member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gm-member-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.gm-member-badges {
+  display: inline-flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.gm-member-id {
+  font-size: 10px;
+  color: var(--ink-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gm-member-actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gm-action-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  border: 1px solid var(--hairline, rgba(0,0,0,0.1));
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.gm-action-btn:hover {
+  background: #f5f5f5;
+}
+
+.gm-action-btn.danger {
+  color: #991B1B;
+  border-color: #FEE2E2;
+}
+
+.gm-action-btn.danger:hover {
+  background: #FEE2E2;
+}
+
+/* ─── 表情包在群聊中的增强样式 ──────────────────────── */
+
+.sticker-bubble {
+  max-width: 160px;
+  max-height: 160px;
+  border-radius: 8px;
+  object-fit: contain;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.sticker-bubble:active {
+  transform: scale(1.1);
+}
+
+.has-sticker {
+  padding: 4px 0;
+}
+
+/* ─── 手机窄屏适配 ──────────────────────────────── */
+
+@media (max-width: 380px) {
+  .redpacket-card {
+    max-width: 260px;
+    min-width: 200px;
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .redpacket-card .rp-icon {
+    font-size: 26px;
+  }
+
+  .redpacket-card .rp-label {
+    font-size: 12px;
+  }
+
+  .redpacket-card .rp-greeting {
+    font-size: 10px;
+  }
+
+  .pay-request-card {
+    max-width: 260px;
+    min-width: 200px;
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .pay-request-card .pr-icon {
+    font-size: 24px;
+  }
+
+  .pay-request-card .pr-label {
+    font-size: 12px;
+  }
+
+  .pay-request-card .pr-amount {
+    font-size: 14px;
+  }
+
+  .group-role-badge,
+  .group-title-badge {
+    font-size: 9px;
+    padding: 0 5px;
+    margin-left: 2px;
+  }
+
+  .group-speaker-name {
+    font-size: 11px;
+  }
+
+  .sticker-bubble {
+    max-width: 120px;
+    max-height: 120px;
+  }
+}

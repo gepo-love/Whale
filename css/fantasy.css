@@ -1,0 +1,1448 @@
+/**
+ * 幻梦 — 漫画/乙女抓/小说 暗色系
+ * 暗紫黑底 + 彩色光晕卡片 + 女性向气质
+ */
+
+/* ═══════ 页面容器 ═══════ */
+
+#fantasyApp .fn-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(123, 55, 92, 0.28), transparent 30%),
+    radial-gradient(circle at 88% 14%, rgba(45, 91, 103, 0.24), transparent 32%),
+    linear-gradient(180deg, #130f18 0%, #1b1421 46%, #101319 100%);
+  color: #efe3ee;
+  font-family: KaiTi, STKaiti, 'Noto Serif SC', serif;
+}
+
+/* ═══════ 三栏切换 ═══════ */
+
+#fantasyApp .fn-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 14px 0;
+  flex-shrink: 0;
+}
+#fantasyApp .fn-tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(225, 205, 224, 0.56);
+  cursor: pointer;
+  letter-spacing: 0;
+  border: 0.5px solid rgba(226, 201, 222, 0.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.035);
+  transition: all 0.25s;
+  position: relative;
+}
+#fantasyApp .fn-tab.active {
+  color: #e8c8ff;
+  border-bottom-color: #c088e8;
+  font-weight: 500;
+}
+#fantasyApp .fn-tab.fn-tab-comic.active  { color: #ff6ba0; border-bottom-color: #ff6ba0; }
+#fantasyApp .fn-tab.fn-tab-drama.active  { color: #9b6bff; border-bottom-color: #9b6bff; }
+#fantasyApp .fn-tab.fn-tab-novel.active  { color: #4ec8a8; border-bottom-color: #4ec8a8; }
+
+/* ═══════ 顶栏操作 ═══════ */
+
+#fantasyApp .fn-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 14px 6px;
+  flex-shrink: 0;
+}
+#fantasyApp .fn-top-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(200,180,220,0.25);
+  background: rgba(255,255,255,0.05);
+  color: rgba(200,180,220,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: all 0.2s;
+}
+#fantasyApp .fn-top-btn:active {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(200,180,220,0.5);
+}
+
+/* ═══════ 推荐卡片区 ═══════ */
+
+#fantasyApp .fn-cards-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 14px 14px;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  min-height: 0;
+}
+#fantasyApp .fn-cards-scroll::-webkit-scrollbar { display: none; }
+
+#fantasyApp .fn-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025));
+  border: 0.5px solid rgba(230,210,225,0.14);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 10px 28px rgba(0,0,0,0.18);
+}
+@media (max-height: 760px) {
+  #fantasyApp .fn-card {
+    padding: 9px 11px;
+  }
+  #fantasyApp .fn-card-desc {
+    -webkit-line-clamp: 1;
+  }
+  #fantasyApp .fn-card-title {
+    font-size: 14px;
+    margin-top: 6px;
+  }
+}
+#fantasyApp .fn-card:active {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(200,180,220,0.3);
+  transform: scale(0.985);
+}
+#fantasyApp .fn-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+  border-radius: 3px 0 0 3px;
+}
+#fantasyApp .fn-card::after {
+  content: '';
+  position: absolute;
+  right: -34px;
+  top: -44px;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  opacity: 0.22;
+  pointer-events: none;
+}
+/* 漫画：粉色光条 */
+#fantasyApp .fn-tab-comic .fn-card::before,
+.fn-card.fn-card-comic::before { background: linear-gradient(180deg, #ff6ba0, #ff4080); }
+.fn-card.fn-card-comic::after { background: #ff6ba0; }
+/* 乙女抓：紫色光条 */
+#fantasyApp .fn-tab-drama .fn-card::before,
+.fn-card.fn-card-drama::before { background: linear-gradient(180deg, #9b6bff, #7b4fff); }
+.fn-card.fn-card-drama::after { background: #9b6bff; }
+/* 小说：青色光条 */
+#fantasyApp .fn-tab-novel .fn-card::before,
+.fn-card.fn-card-novel::before { background: linear-gradient(180deg, #4ec8a8, #2ea888); }
+.fn-card.fn-card-novel::after { background: #4ec8a8; }
+
+#fantasyApp .fn-card-cover {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+#fantasyApp .fn-card-title {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff5fb;
+  letter-spacing: 0;
+  margin-top: 7px;
+  line-height: 1.25;
+  position: relative;
+  z-index: 1;
+}
+#fantasyApp .fn-card-desc {
+  font-size: 12px;
+  color: rgba(238, 224, 236, 0.72);
+  line-height: 1.45;
+  letter-spacing: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+#fantasyApp .fn-card-tags {
+  display: flex;
+  gap: 5px;
+  margin-top: 7px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+#fantasyApp .fn-card-tag {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0;
+  font-weight: 300;
+}
+/* 漫画标签 */
+.fn-tag-comic {
+  background: rgba(255,107,160,0.12);
+  color: #ff9ec8;
+  border: 0.5px solid rgba(255,107,160,0.2);
+}
+/* 乙女抓标签 */
+.fn-tag-drama {
+  background: rgba(155,107,255,0.12);
+  color: #c8a8ff;
+  border: 0.5px solid rgba(155,107,255,0.2);
+}
+/* 小说标签 */
+.fn-tag-novel {
+  background: rgba(78,200,168,0.12);
+  color: #8ed8c8;
+  border: 0.5px solid rgba(78,200,168,0.2);
+}
+
+/* ═══════ 空态 & Loading ═══════ */
+
+#fantasyApp .fn-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(200,180,220,0.25);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+#fantasyApp .fn-empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+#fantasyApp .fn-loading {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  padding: 20px;
+}
+#fantasyApp .fn-loading-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(200,180,220,0.4);
+  animation: fnDot 1.2s infinite;
+}
+#fantasyApp .fn-loading-dot:nth-child(2) { animation-delay: 0.15s; }
+#fantasyApp .fn-loading-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes fnDot {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(1); }
+  40% { opacity: 1; transform: scale(1.5); }
+}
+
+/* ═══════ 乙女模式（全屏立绘+半透明对话框） ═══ */
+
+#fantasyApp .fn-otome-stage {
+  flex: 1 1 auto;
+  min-height: 360px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+/* 立绘背景（无上传时暗色渐变占位） */
+#fantasyApp .fn-otome-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(192,136,232,0.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 触碰区域层 */
+#fantasyApp .fn-otome-touch-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+#fantasyApp .fn-otome-zone {
+  position: absolute;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 3;
+  transition: transform 0.15s, box-shadow 0.15s;
+  animation: none;
+}
+#fantasyApp .fn-otome-zone::after {
+  content: none;
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+  transform: translate(-50%, -50%);
+}
+@keyframes fnZonePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+}
+#fantasyApp .fn-otome-zone:active {
+  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow: 0 0 28px rgba(255,255,255,0.18);
+}
+
+/* 顶部信息栏 */
+#fantasyApp .fn-otome-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  z-index: 10;
+  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+#fantasyApp .fn-otome-back {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  border: 0.5px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+#fantasyApp .fn-otome-info {
+  flex: 1;
+  min-width: 0;
+}
+#fantasyApp .fn-otome-title {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#fantasyApp .fn-otome-char-name {
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+#fantasyApp .fn-otome-upload-btn {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(6px);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* 半透明对话框 */
+#fantasyApp .fn-otome-dialogue-box {
+  position: relative;
+  z-index: 5;
+  margin: 0 12px 8px;
+  padding: 11px 14px 10px;
+  background: linear-gradient(180deg,
+    rgba(246,244,239,0.82) 0%,
+    rgba(238,235,229,0.9) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 0.5px solid rgba(255,255,255,0.55);
+  cursor: pointer;
+  min-height: 66px;
+  max-height: 24vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.16);
+}
+#fantasyApp .fn-otome-dialogue-box::-webkit-scrollbar { display: none; }
+#fantasyApp .fn-otome-name-tag {
+  display: inline-block;
+  font-size: 11px;
+  color: #8d785f;
+  background: rgba(255,255,255,0.42);
+  padding: 2px 10px;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+#fantasyApp .fn-otome-dialogue-text {
+  font-size: 15px;
+  color: #5f5a55;
+  line-height: 1.62;
+  letter-spacing: 0;
+  font-family: KaiTi, STKaiti, serif;
+}
+#fantasyApp .fn-otome-history {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 0.5px solid rgba(80,70,60,0.1);
+  font-size: 11px;
+  line-height: 1.6;
+  color: rgba(90,82,74,0.5);
+  max-height: 80px;
+  overflow-y: auto;
+}
+#fantasyApp .fn-otome-role-line { color: rgba(200,168,255,0.5); display: block; margin-bottom: 2px; }
+#fantasyApp .fn-otome-user-line { color: rgba(90,82,74,0.42); display: block; margin-bottom: 2px; }
+#fantasyApp .fn-otome-next-mark {
+  margin-top: 5px;
+  text-align: right;
+  font-size: 10px;
+  color: rgba(90,82,74,0.38);
+}
+#fantasyApp .fn-otome-typing {
+  color: rgba(255,255,255,0.3);
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-top: 6px;
+  animation: fnPulse 1.5s ease-in-out infinite;
+}
+@keyframes fnPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+/* 底部输入区 */
+#fantasyApp .fn-otome-input-bar {
+  position: relative;
+  z-index: 5;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 12px;
+  margin: 0 10px;
+}
+#fantasyApp .fn-otome-input-bar.show { display: flex; }
+#fantasyApp .fn-otome-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 0.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(8px);
+  color: #4e4944;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+}
+#fantasyApp .fn-otome-input::placeholder { color: rgba(80,72,65,0.35); }
+#fantasyApp .fn-otome-input:focus { border-color: rgba(192,136,232,0.4); }
+#fantasyApp .fn-otome-input:disabled { opacity: 0.4; }
+#fantasyApp .fn-otome-send {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(20,20,20,0.72);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+#fantasyApp .fn-otome-send:active { transform: scale(0.9); }
+#fantasyApp .fn-otome-send.loading { opacity: 0.4; pointer-events: none; }
+
+/* ═══════ 详情视图 ═══════ */
+
+#fantasyApp .fn-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+#fantasyApp .fn-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 8px;
+  border-bottom: 0.5px solid rgba(226,201,222,0.08);
+  flex-shrink: 0;
+}
+#fantasyApp .fn-detail-back {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(200,180,220,0.2);
+  background: rgba(255,255,255,0.03);
+  color: rgba(200,180,220,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+#fantasyApp .fn-detail-back:active {
+  background: rgba(255,255,255,0.08);
+}
+#fantasyApp .fn-detail-meta {
+  flex: 1;
+  min-width: 0;
+}
+#fantasyApp .fn-detail-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff5fb;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#fantasyApp .fn-detail-sub {
+  font-size: 11px;
+  color: rgba(200,180,220,0.45);
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+#fantasyApp .fn-work-summary {
+  flex-shrink: 0;
+  margin: 8px 14px 0;
+  padding: 10px 12px;
+  border: 0.5px solid rgba(226,201,222,0.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.045);
+  color: rgba(238,224,236,0.72);
+  font-size: 12px;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+/* ═══════ 对话区（漫画/乙女抓） ═══════ */
+
+#fantasyApp .fn-chat-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+#fantasyApp .fn-chat-area::-webkit-scrollbar { display: none; }
+
+#fantasyApp .fn-msg {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: 0;
+  overflow-wrap: break-word; word-break: normal;
+}
+#fantasyApp .fn-msg-role {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(200,180,220,0.12);
+  color: #e8d5f5;
+  border-bottom-left-radius: 4px;
+}
+#fantasyApp .fn-msg-user {
+  align-self: flex-end;
+  background: rgba(192,136,232,0.18);
+  border: 0.5px solid rgba(192,136,232,0.25);
+  color: #f0e0ff;
+  border-bottom-right-radius: 4px;
+}
+#fantasyApp .fn-msg-system {
+  align-self: center;
+  background: transparent;
+  color: rgba(200,180,220,0.35);
+  font-size: 11px;
+  letter-spacing: 1px;
+  max-width: 90%;
+  text-align: center;
+}
+#fantasyApp .fn-msg-role .fn-msg-speaker {
+  font-size: 10px;
+  color: rgba(200,180,220,0.45);
+  margin-bottom: 3px;
+  letter-spacing: 0.8px;
+}
+
+/* ═══════ 输入区 ═══════ */
+
+#fantasyApp .fn-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 0.5px solid rgba(200,180,220,0.1);
+  background: rgba(0,0,0,0.22);
+  flex-shrink: 0;
+}
+#fantasyApp .fn-input {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 0.5px solid rgba(200,180,220,0.2);
+  background: rgba(255,255,255,0.05);
+  color: #e8d5f5;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  letter-spacing: 0;
+}
+#fantasyApp .fn-input::placeholder {
+  color: rgba(200,180,220,0.3);
+}
+#fantasyApp .fn-input:focus {
+  border-color: rgba(200,180,220,0.4);
+  background: rgba(255,255,255,0.08);
+}
+#fantasyApp .fn-send-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, rgba(192,136,232,0.5), rgba(155,107,255,0.4));
+  color: #f0e0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+#fantasyApp .fn-send-btn:active {
+  transform: scale(0.9);
+  opacity: 0.8;
+}
+#fantasyApp .fn-send-btn.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ═══════ 小说正文区（阅读器样式） ═══════ */
+
+#fantasyApp .fn-novel-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(78,200,168,0.06), transparent 40%),
+    linear-gradient(180deg, rgba(16,19,25,0.4), rgba(16,19,25,0.6));
+}
+#fantasyApp .fn-novel-wrapper::-webkit-scrollbar { display: none; }
+
+#fantasyApp .fn-novel-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 18px 32px;
+  font-size: 15px;
+  line-height: 2;
+  letter-spacing: 0.4px;
+  color: #d4c8de;
+  font-family: KaiTi, STKaiti, 'Noto Serif SC', Georgia, serif;
+}
+
+/* 作品标题 */
+#fantasyApp .fn-novel-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+  color: #f0e0ff;
+  letter-spacing: 2px;
+  margin: 4px 0 8px;
+  line-height: 1.5;
+}
+
+/* 作者署名 */
+#fantasyApp .fn-novel-byline {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(200,180,220,0.35);
+  letter-spacing: 1.5px;
+  margin-bottom: 28px;
+}
+
+/* 章节标题 */
+#fantasyApp .fn-novel-chapter {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: #c8b8e0;
+  letter-spacing: 2px;
+  margin: 28px 0 16px;
+  padding-top: 20px;
+  border-top: 0.5px solid rgba(200,180,220,0.1);
+}
+
+/* 正文段落 */
+#fantasyApp .fn-novel-content p {
+  margin-bottom: 16px;
+  text-indent: 2em;
+  text-align: justify;
+}
+
+/* 场景分隔 */
+#fantasyApp .fn-novel-scene-break {
+  text-align: center;
+  padding: 12px 0;
+  color: rgba(200,180,220,0.25);
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-indent: 0;
+}
+
+/* 作品简介卡片 */
+#fantasyApp .fn-novel-synopsis {
+  flex-shrink: 0;
+  margin: 6px 14px 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(78,200,168,0.06);
+  border: 0.5px solid rgba(78,200,168,0.12);
+  font-size: 12px;
+  color: rgba(200,220,210,0.55);
+  line-height: 1.55;
+  letter-spacing: 0.4px;
+}
+
+/* 底部状态栏 */
+#fantasyApp .fn-novel-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-top: 0.5px solid rgba(226,201,222,0.06);
+  background: rgba(0,0,0,0.1);
+}
+#fantasyApp .fn-novel-wordcount {
+  font-size: 11px;
+  color: rgba(200,180,220,0.3);
+  letter-spacing: 0.5px;
+}
+#fantasyApp .fn-novel-more-btn {
+  padding: 7px 22px;
+  border-radius: 20px;
+  border: 0.5px solid rgba(78,200,168,0.35);
+  background: rgba(78,200,168,0.1);
+  color: #8ed8c8;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+#fantasyApp .fn-novel-more-btn:active {
+  background: rgba(78,200,168,0.22);
+  border-color: rgba(78,200,168,0.55);
+}
+#fantasyApp .fn-novel-more-btn.loading {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* 小说 loading 状态 */
+#fantasyApp .fn-novel-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(200,180,220,0.35);
+  gap: 10px;
+  min-height: 200px;
+}
+#fantasyApp .fn-novel-loading-text {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+}
+
+/* ═══════ 自定义面板弹窗 ═══════ */
+
+#fantasyApp .fn-custom-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#fantasyApp .fn-custom-panel {
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  background: #221836;
+  border-radius: 8px 8px 0 0;
+  padding: 16px 18px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid rgba(200,180,220,0.15);
+}
+#fantasyApp .fn-custom-panel::-webkit-scrollbar { display: none; }
+#fantasyApp .fn-custom-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #e8d5f5;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 2px;
+}
+#fantasyApp .fn-custom-label {
+  font-size: 11px;
+  color: rgba(200,180,220,0.5);
+  letter-spacing: 0.5px;
+  margin-bottom: -6px;
+}
+#fantasyApp .fn-custom-select,
+#fantasyApp .fn-custom-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 0.5px solid rgba(200,180,220,0.15);
+  background: rgba(255,255,255,0.05);
+  color: #e8d5f5;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  box-sizing: border-box;
+}
+#fantasyApp .fn-custom-select option {
+  background: #221836;
+  color: #e8d5f5;
+}
+#fantasyApp .fn-custom-input::placeholder {
+  color: rgba(200,180,220,0.25);
+}
+#fantasyApp .fn-custom-input:focus,
+#fantasyApp .fn-custom-select:focus {
+  border-color: rgba(200,180,220,0.4);
+}
+#fantasyApp .fn-custom-textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+#fantasyApp .fn-custom-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+#fantasyApp .fn-custom-cancel {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: 0.5px solid rgba(200,180,220,0.2);
+  background: transparent;
+  color: rgba(200,180,220,0.6);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 1px;
+  text-align: center;
+}
+#fantasyApp .fn-custom-generate {
+  flex: 2;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, rgba(192,136,232,0.5), rgba(155,107,255,0.35));
+  color: #f0e0ff;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 1px;
+  font-weight: 500;
+  text-align: center;
+}
+#fantasyApp .fn-custom-generate:active {
+  opacity: 0.8;
+}
+
+/* ═══════ 角色小标签（详情页角色选择） ═══════ */
+
+#fantasyApp .fn-char-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  flex-shrink: 0;
+  border-bottom: 0.5px solid rgba(200,180,220,0.08);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#fantasyApp .fn-char-select::-webkit-scrollbar { display: none; }
+#fantasyApp .fn-char-chip {
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  border: 0.5px solid rgba(200,180,220,0.15);
+  background: rgba(255,255,255,0.03);
+  color: rgba(200,180,220,0.5);
+  transition: all 0.2s;
+}
+#fantasyApp .fn-char-chip.active {
+  background: rgba(192,136,232,0.2);
+  border-color: rgba(192,136,232,0.4);
+  color: #e8c8ff;
+}
+#fantasyApp .fn-char-chip:active {
+  background: rgba(255,255,255,0.08);
+}
+
+/* ═══════ 触碰立绘 ═══════ */
+
+/* 立绘容器 */
+#fantasyApp .fn-touch-area {
+  flex-shrink: 0;
+  position: relative;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 0.5px solid rgba(226,201,222,0.08);
+  overflow: hidden;
+}
+#fantasyApp .fn-touch-img-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 42vh;
+  overflow: hidden;
+}
+#fantasyApp .fn-touch-img {
+  max-width: 100%;
+  max-height: 42vh;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+/* 定义模式光标提示 */
+#fantasyApp .fn-touch-img.defining {
+  cursor: crosshair;
+}
+/* 准备模式：区域可点 */
+#fantasyApp .fn-touch-img.ready {
+  cursor: default;
+}
+
+/* 触碰区域标记 */
+#fantasyApp .fn-touch-zone {
+  position: absolute;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.75);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.15s, box-shadow 0.15s;
+  z-index: 5;
+}
+#fantasyApp .fn-touch-zone::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  transform: translate(-50%, -50%);
+}
+#fantasyApp .fn-touch-zone:active {
+  transform: translate(-50%, -50%) scale(1.4);
+  box-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+/* 部位标签 */
+#fantasyApp .fn-touch-zone-label {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #fff;
+  background: rgba(0,0,0,0.65);
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: 0.5px;
+}
+
+/* 立绘工具栏 */
+#fantasyApp .fn-touch-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+#fantasyApp .fn-touch-toolbar-text {
+  flex: 1;
+  font-size: 11px;
+  color: rgba(200,180,220,0.45);
+  letter-spacing: 0.5px;
+}
+#fantasyApp .fn-touch-toolbar-btn {
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 0.5px solid rgba(200,180,220,0.2);
+  background: rgba(255,255,255,0.05);
+  color: rgba(200,180,220,0.6);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+#fantasyApp .fn-touch-toolbar-btn:active {
+  background: rgba(255,255,255,0.12);
+}
+#fantasyApp .fn-touch-toolbar-btn.primary {
+  background: rgba(192,136,232,0.25);
+  border-color: rgba(192,136,232,0.35);
+  color: #e8c8ff;
+}
+/* 上传按钮（对话工具栏内） */
+#fantasyApp .fn-touch-upload-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(200,180,220,0.2);
+  background: rgba(255,255,255,0.05);
+  color: rgba(200,180,220,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+#fantasyApp .fn-touch-upload-btn:active {
+  background: rgba(255,255,255,0.12);
+}
+#fantasyApp .fn-touch-upload-btn.has-image {
+  border-color: rgba(255,107,160,0.4);
+  color: #ff9ec8;
+}
+
+/* 部位名输入弹窗 */
+#fantasyApp .fn-touch-label-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#fantasyApp .fn-touch-label-box {
+  background: #221836;
+  border-radius: 14px;
+  padding: 18px 20px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 0.5px solid rgba(200,180,220,0.15);
+}
+#fantasyApp .fn-touch-label-box input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 0.5px solid rgba(200,180,220,0.2);
+  background: rgba(255,255,255,0.06);
+  color: #e8d5f5;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+#fantasyApp .fn-touch-label-box input:focus {
+  border-color: rgba(200,180,220,0.4);
+}
+#fantasyApp .fn-touch-label-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+#fantasyApp .fn-touch-label-actions button {
+  padding: 6px 16px;
+  border-radius: 14px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  border: 0.5px solid rgba(200,180,220,0.15);
+  background: rgba(255,255,255,0.05);
+  color: rgba(200,180,220,0.6);
+}
+#fantasyApp .fn-touch-label-actions button.confirm {
+  background: rgba(192,136,232,0.25);
+  color: #e8c8ff;
+}
+
+/* ═══════ 弹幕 ═══════ */
+
+#fantasyApp .fn-danmaku-layer {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 200;
+  overflow: hidden;
+}
+#fantasyApp .fn-danmaku-item {
+  position: absolute;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255,107,160,0.6),
+    0 0 20px rgba(255,107,160,0.3),
+    0 2px 4px rgba(0,0,0,0.7);
+  animation: fnDanmakuFly 5s linear forwards;
+  pointer-events: none;
+  font-family: KaiTi, STKaiti, serif;
+}
+@keyframes fnDanmakuFly {
+  0%   { transform: translateX(100vw); opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translateX(-120%); opacity: 0; }
+}
+
+/* 20260624b 乙女触碰互动：全屏立绘、隐藏热区、上滚弹幕 */
+#fantasyApp .fn-otome-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 360px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+#fantasyApp .fn-otome-touch-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+#fantasyApp .fn-otome-zone,
+#fantasyApp .fn-touch-zone-hotspot {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 4;
+}
+#fantasyApp .fn-otome-zone.tapped,
+#fantasyApp .fn-touch-zone.tapped {
+  background: rgba(255,255,255,0.16);
+  box-shadow: 0 0 28px rgba(255,255,255,0.35);
+}
+#fantasyApp .fn-otome-top {
+  position: relative;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.58), rgba(0,0,0,0));
+  color: #fff;
+}
+#fantasyApp .fn-otome-back,
+#fantasyApp .fn-otome-upload-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+}
+#fantasyApp .fn-otome-info {
+  flex: 1;
+  min-width: 0;
+}
+#fantasyApp .fn-otome-title {
+  font-size: 12px;
+  color: rgba(255,255,255,0.78);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#fantasyApp .fn-otome-char-name {
+  font-size: 15px;
+  color: #fff;
+  margin-top: 2px;
+}
+#fantasyApp .fn-otome-dialogue-box {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 64px;
+  z-index: 9;
+  min-height: 132px;
+  padding: 18px 18px 14px;
+  border-radius: 12px 12px 18px 18px;
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(210,190,160,0.72);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  color: #5d5d5d;
+}
+#fantasyApp .fn-otome-name-tag {
+  position: absolute;
+  top: -16px;
+  left: 18px;
+  min-width: 92px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.94);
+  border: 1px solid rgba(205,181,142,0.7);
+  color: #8c7a5f;
+  font-size: 13px;
+}
+#fantasyApp .fn-otome-dialogue-text {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #666;
+  letter-spacing: 0.5px;
+}
+#fantasyApp .fn-otome-history {
+  margin-top: 10px;
+  max-height: 44px;
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1.45;
+  color: rgba(70,70,70,0.42);
+}
+#fantasyApp .fn-otome-input-bar {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 14px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+#fantasyApp .fn-otome-input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 18px;
+  padding: 9px 14px;
+  background: rgba(255,255,255,0.72);
+  color: #333;
+  outline: none;
+  font-family: inherit;
+}
+#fantasyApp .fn-otome-send {
+  width: 38px;
+  height: 38px;
+  border-radius: 19px;
+  border: none;
+  background: rgba(40,40,40,0.72);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#fantasyApp .fn-danmaku-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+}
+#fantasyApp .fn-danmaku-item {
+  bottom: 118px;
+  top: auto;
+  max-width: 76%;
+  white-space: normal;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.5;
+  animation-name: fnDanmakuFly;
+}
+@keyframes fnDanmakuFly {
+  0% { transform: translate(-50%, 28vh); opacity: 0; }
+  14% { opacity: 1; }
+  82% { opacity: 1; }
+  100% { transform: translate(-50%, -58vh); opacity: 0; }
+}
+
+/* 20260625 乙女界面：纯立绘、低矮对话框、分页后再输入 */
+#fantasyApp .fn-danmaku-layer,
+#fantasyApp .fn-danmaku-item {
+  display: none !important;
+}
+#fantasyApp .fn-otome-zone,
+#fantasyApp .fn-touch-zone-hotspot {
+  width: 72px;
+  height: 72px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+#fantasyApp .fn-otome-zone::after {
+  content: none !important;
+}
+#fantasyApp .fn-otome-zone.tapped,
+#fantasyApp .fn-touch-zone.tapped {
+  background: rgba(255,255,255,0.12) !important;
+  box-shadow: 0 0 24px rgba(255,255,255,0.16) !important;
+}
+#fantasyApp .fn-otome-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  align-items: flex-start;
+}
+#fantasyApp .fn-otome-back,
+#fantasyApp .fn-otome-upload-btn {
+  font-size: 16px;
+  border: 0.5px solid rgba(255,255,255,0.22);
+  background: rgba(12,12,16,0.34);
+  backdrop-filter: blur(6px);
+}
+#fantasyApp .fn-otome-dialogue-box {
+  left: 12px;
+  right: 12px;
+  bottom: 54px;
+  z-index: 30;
+  min-height: 74px;
+  max-height: 22vh;
+  padding: 12px 14px 10px;
+  border-radius: 12px;
+  background: rgba(244,242,237,0.88);
+  border: 0.5px solid rgba(255,255,255,0.64);
+  color: #5f5a55;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+#fantasyApp .fn-otome-name-tag {
+  position: static;
+  min-width: 0;
+  width: fit-content;
+  padding: 2px 9px;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  font-size: 11px;
+  background: rgba(255,255,255,0.48);
+  color: #8d785f;
+}
+#fantasyApp .fn-otome-dialogue-text {
+  font-size: 14px;
+  line-height: 1.62;
+  color: #5f5a55;
+  letter-spacing: 0;
+}
+#fantasyApp .fn-otome-history {
+  margin-top: 6px;
+  padding-top: 5px;
+  max-height: 28px;
+  border-top: 0.5px solid rgba(80,70,60,0.1);
+  color: rgba(90,82,74,0.45);
+}
+#fantasyApp .fn-otome-next-mark {
+  margin-top: 5px;
+  text-align: right;
+  font-size: 10px;
+  color: rgba(90,82,74,0.38);
+}
+#fantasyApp .fn-otome-input-bar {
+  display: none;
+  bottom: 10px;
+  padding: 0;
+}
+#fantasyApp .fn-otome-input-bar.show {
+  display: flex;
+}
+#fantasyApp .fn-otome-input {
+  font-size: 13px;
+  border: 0.5px solid rgba(255,255,255,0.52);
+  background: rgba(255,255,255,0.76);
+  color: #4e4944;
+}
+#fantasyApp .fn-otome-input::placeholder {
+  color: rgba(80,72,65,0.35);
+}
+
+/* ═══════ 全屏模式（详情页专用）═══════ */
+#fantasyApp.fn-fullscreen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: #0d0a14;
+}
+#fantasyApp.fn-fullscreen > .nav-bar {
+  display: none !important;
+}
+#fantasyApp.fn-fullscreen #fantasyContent {
+  height: 100vh;
+  height: 100dvh;
+}
+.fn-fullscreen-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  padding: 3px 8px;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.fn-fullscreen-btn:hover {
+  border-color: rgba(255,255,255,0.6);
+  color: #fff;
+}

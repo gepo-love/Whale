@@ -1,0 +1,490 @@
+/* ═══════════════════════════════════════════
+   小手机 — 打电话 · 通话页面样式
+   ═══════════════════════════════════════════ */
+
+/* ── 全屏暗色容器 ── */
+.call-shell {
+  position: absolute; inset: 0; z-index: 1;
+  display: flex; flex-direction: column;
+  background: #2c2c2e;
+  animation: callFadeIn 0.4s ease-out;
+  overflow: hidden;
+  font-family: var(--font, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif);
+  user-select: none;
+  -webkit-user-select: none;
+}
+@keyframes callFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── 立绘背景 + 暗色渐变遮罩 ── */
+.call-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center center;
+  background-repeat: no-repeat;
+  background-color: #2c2c2e;
+  opacity: 0.25;
+}
+.call-bg-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(44,44,46,0.3) 0%,
+    rgba(44,44,46,0.1) 40%,
+    rgba(44,44,46,0.5) 80%,
+    rgba(44,44,46,0.85) 100%
+  );
+}
+
+/* ── 背景上传按钮（右上角）── */
+.call-bg-upload {
+  position: absolute; top: 12px; right: 12px; z-index: 10;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 0.5px solid rgba(255,255,255,0.10);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  opacity: 0.6; transition: opacity 0.2s;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.call-bg-upload:active { opacity: 1; }
+.call-bg-upload svg { display: block; }
+
+/* ── 顶部 · 头像 + 角色名 + 状态文字 ── */
+.call-top {
+  position: relative; z-index: 5;
+  display: flex; flex-direction: column; align-items: center;
+  padding: calc(50px + var(--sab, 0px)) 20px 16px;
+  gap: 8px;
+  pointer-events: none;
+}
+.call-avatar {
+  width: 90px; height: 90px;
+  border-radius: 12px;
+  background-size: cover; background-position: center;
+  background-color: rgba(255,255,255,0.06);
+  border: 2px solid rgba(255,255,255,0.2);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  color: rgba(255,255,255,0.4);
+}
+.call-friend-name {
+  font-size: 24px; font-weight: 600; color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.call-status-text {
+  font-size: 15px; color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  font-weight: 400;
+  transition: color 0.3s;
+}
+
+/* ── 拨打动画 · 三点跳动 ── */
+.call-dialing-dots {
+  display: flex; gap: 10px; justify-content: center;
+  margin-top: 8px; min-height: 20px; align-items: center;
+}
+.call-dialing-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  animation: callDotPulse 1.4s infinite ease-in-out;
+}
+.call-dialing-dot:nth-child(1) { animation-delay: 0s; }
+.call-dialing-dot:nth-child(2) { animation-delay: 0.2s; }
+.call-dialing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes callDotPulse {
+  0%, 80%, 100% { transform: scale(0.4); opacity: 0.3; }
+  40%           { transform: scale(1);   opacity: 1; }
+}
+
+/* ── 气泡聊天区 ── */
+.call-bubbles {
+  position: relative; z-index: 5;
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 8px 16px 8px;
+  display: flex; flex-direction: column; gap: 10px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  mask-image: linear-gradient(to bottom, transparent 0, black 18px, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 18px, black 100%);
+}
+.call-bubbles::-webkit-scrollbar { display: none; }
+
+.call-bubble {
+  max-width: 78%; padding: 10px 14px; border-radius: 16px;
+  font-size: 14px; line-height: 1.55; letter-spacing: 0.5px;
+  overflow-wrap: break-word; word-break: normal;
+  animation: callBubbleIn 0.28s ease-out;
+  position: relative;
+}
+@keyframes callBubbleIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* AI 气泡（左）— 毛玻璃 */
+.call-bubble-left {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+  border-bottom-left-radius: 4px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 0.5px solid rgba(255,255,255,0.08);
+}
+
+/* 用户气泡（右）— 蓝色 */
+.call-bubble-right {
+  align-self: flex-end;
+  background: #007aff;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,122,255,0.2);
+}
+
+/* 翻译气泡 */
+.call-bubble-trans {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 5px 12px;
+  font-size: 13px;
+  opacity: 0.78;
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  border-radius: 4px 14px 14px 14px;
+  border: 1px dashed rgba(255,255,255,0.12);
+  animation: callBubbleIn 0.28s ease-out;
+}
+
+/* 语音识别中提示 */
+.call-bubble-voice-hint {
+  align-self: center;
+  font-size: 11px; color: rgba(255,255,255,0.35);
+  padding: 4px 12px;
+  letter-spacing: 0.5px;
+  animation: callBubbleIn 0.28s ease-out;
+}
+
+/* 系统提示气泡 */
+.call-bubble-system {
+  align-self: center;
+  font-size: 12px; color: rgba(255,255,255,0.35);
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  animation: callBubbleIn 0.28s ease-out;
+}
+.call-bubble-right[data-call-msg-id], .call-bubble-left[data-call-msg-id] {
+  cursor: pointer;
+}
+
+/* ── 通话气泡操作菜单 ── */
+.call-bubble-menu {
+  z-index: 9999;
+  background: var(--surface-card, #fff);
+  border: 1px solid var(--border-light, #e0e0e0);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  overflow: hidden;
+  min-width: 80px;
+}
+.call-bubble-menu button {
+  display: block; width: 100%;
+  padding: 10px 16px;
+  background: none; border: none;
+  font-size: 14px; color: var(--ink, #333);
+  cursor: pointer; text-align: left;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+}
+.call-bubble-menu button:hover { background: var(--surface-page, #f5f5f5); }
+.call-bubble-menu button:not(:last-child) { border-bottom: 1px solid var(--border-light, #eee); }
+
+/* ── 播放中的语音指示 ── */
+.call-speaking-indicator {
+  align-self: flex-start;
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  font-size: 12px; color: rgba(255,255,255,0.5);
+  letter-spacing: 0.5px;
+  animation: callBubbleIn 0.28s ease-out;
+}
+.call-speaking-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--monet-blue, #7BA5B8);
+  animation: callSpeakingPulse 0.6s infinite alternate;
+}
+@keyframes callSpeakingPulse {
+  from { opacity: 0.3; transform: scale(0.7); }
+  to   { opacity: 1;   transform: scale(1.1); }
+}
+
+/* ── 底部输入栏 ── */
+.call-input-bar {
+  position: relative; z-index: 5;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px calc(10px + var(--sab, env(safe-area-inset-bottom, 0px)));
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 0.5px solid rgba(255,255,255,0.06);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.call-input-bar.hidden {
+  opacity: 0; pointer-events: none; transform: translateY(20px);
+}
+
+.call-input {
+  flex: 1; padding: 10px 16px; border-radius: 22px;
+  min-width: 0;
+  background: rgba(255,255,255,0.08); border: 0.5px solid rgba(255,255,255,0.10);
+  color: #fff; font-size: 14px; letter-spacing: 0.5px;
+  outline: none; font-family: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+.call-input::placeholder { color: rgba(255,255,255,0.30); }
+.call-input:focus {
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.12);
+}
+
+.call-send-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--monet-blue, #7BA5B8); border: none; color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; padding: 0;
+  touch-action: manipulation;
+  box-shadow: 0 2px 10px rgba(123,165,184,0.25);
+  transition: opacity 0.2s, transform 0.15s;
+}
+.call-send-btn:active { transform: scale(0.92); }
+.call-send-btn.disabled { opacity: 0.35; pointer-events: none; }
+.call-send-btn svg { width: 18px; height: 18px; display: block; }
+
+/* ── 底部三个操作按钮（毛玻璃圆形 + 标签）── */
+.call-actions {
+  position: relative; z-index: 5;
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 44px;
+  padding: 10px 0 calc(24px + var(--sab, env(safe-area-inset-bottom, 0px)));
+  transition: opacity 0.3s, transform 0.3s;
+}
+.call-actions.hidden {
+  opacity: 0; pointer-events: none; transform: translateY(20px);
+}
+
+.call-action-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.call-action-btn {
+  width: 60px; height: 60px; border-radius: 50%;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  touch-action: manipulation;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.call-action-btn:active { transform: scale(0.88); }
+.call-action-btn svg { display: block; }
+.call-action-label {
+  font-size: 11px; color: rgba(255,255,255,0.45);
+  letter-spacing: 1px; font-weight: 300;
+}
+
+/* 静音按钮 */
+.call-btn-mute {
+  background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7);
+  border: 0.5px solid rgba(255,255,255,0.1);
+}
+.call-btn-mute.active {
+  background: rgba(255,255,255,0.25); color: #fff;
+}
+.call-btn-mute svg { width: 24px; height: 24px; }
+
+/* 挂断按钮（红色，更大） */
+.call-btn-hangup {
+  width: 68px; height: 68px;
+  background: #ff3b30; color: #fff;
+  box-shadow: 0 4px 20px rgba(255,59,48,0.45);
+}
+.call-btn-hangup:active {
+  background: #d63029;
+  box-shadow: 0 2px 10px rgba(255,59,48,0.3);
+}
+.call-btn-hangup svg { width: 28px; height: 28px; }
+
+/* 麦克风按钮 */
+.call-btn-mic {
+  background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7);
+  border: 0.5px solid rgba(255,255,255,0.1);
+}
+.call-btn-mic.active {
+  background: rgba(52,199,89,0.7); color: #fff;
+  animation: callMicPulse 1.6s infinite;
+  border-color: rgba(52,199,89,0.3);
+}
+.call-btn-mic svg { width: 24px; height: 24px; }
+@keyframes callMicPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52,199,89,0.4); }
+  50%      { box-shadow: 0 0 0 14px rgba(52,199,89,0); }
+}
+
+/* ── 来电全屏覆盖 ── */
+.call-incoming-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  /* 深灰背景替代纯黑，更柔和自然 */
+  background: #2c2c2e;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  padding: calc(80px + env(safe-area-inset-top, 0px)) 20px calc(40px + var(--sab, env(safe-area-inset-bottom, 0px)));
+  gap: 12px;
+  animation: callFadeIn 0.3s ease-out;
+}
+.call-incoming-avatar {
+  width: 90px; height: 90px;
+  /* 圆角方形 — 真手机来电头像都是这样 */
+  border-radius: 12px;
+  background-size: cover; background-position: center;
+  background-color: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.25);
+  margin-bottom: 8px;
+}
+.call-incoming-name {
+  font-size: 24px; color: #fff; font-weight: 600;
+  letter-spacing: 2px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.call-incoming-hint {
+  font-size: 16px; color: rgba(255,255,255,0.55);
+  letter-spacing: 1px;
+  /* 去掉脉冲动画，用静态文字更有"等你自己决定"的压迫感 */
+}
+.call-incoming-hint.ringing {
+  animation: none;
+}
+.call-incoming-actions {
+  display: flex; gap: 56px; margin-top: 32px;
+}
+.call-incoming-decline,
+.call-incoming-accept {
+  width: 64px; height: 64px; border-radius: 50%;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s, opacity 0.15s;
+  padding: 0;
+  /* 毛玻璃底色（后续实色覆盖）*/
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.call-incoming-decline:active,
+.call-incoming-accept:active { transform: scale(0.88); opacity: 0.85; }
+.call-incoming-decline { background: #ff3b30; color: #fff; box-shadow: 0 4px 16px rgba(255,59,48,0.35); }
+.call-incoming-accept  { background: #34c759; color: #fff; box-shadow: 0 4px 16px rgba(52,199,89,0.35); }
+.call-incoming-decline svg { width: 28px; height: 28px; }
+.call-incoming-accept svg  { width: 28px; height: 28px; }
+.call-incoming-label {
+  font-size: 12px; color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+}
+.call-incoming-label-row {
+  display: flex; gap: 56px; margin-top: -4px;
+}
+.call-incoming-label-row span {
+  width: 64px; text-align: center;
+  font-size: 12px; color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+}
+
+/* ── 挂断弹窗 ── */
+.call-end-overlay {
+  position: absolute; inset: 0; z-index: 50;
+  background: rgba(0,0,0,0);
+  display: flex; align-items: center; justify-content: center;
+  animation: callEndOverlayIn 0.5s ease-out forwards;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+}
+@keyframes callEndOverlayIn {
+  0%   { background: rgba(0,0,0,0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
+  100% { background: rgba(0,0,0,0.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+}
+
+.call-end-card {
+  background: rgba(28,28,30,0.96); border-radius: 24px;
+  padding: 32px 28px 28px; text-align: center;
+  width: 280px; max-width: 85vw;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 0.5px solid rgba(255,255,255,0.06);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: callEndCardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes callEndCardIn {
+  0%   { opacity: 0; transform: scale(0.85) translateY(30px); }
+  60%  { opacity: 1; transform: scale(1.02) translateY(-4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.call-end-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(229,62,62,0.15);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  animation: callEndIconIn 0.6s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes callEndIconIn {
+  0%   { opacity: 0; transform: scale(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.call-end-title {
+  font-size: 14px; color: rgba(255,255,255,0.45);
+  letter-spacing: 2px; margin-bottom: 4px; font-weight: 400;
+}
+.call-end-duration {
+  font-size: 40px; color: #fff; font-weight: 200;
+  letter-spacing: 4px; font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.call-end-stats {
+  font-size: 13px; color: rgba(255,255,255,0.35);
+  margin-top: 4px; letter-spacing: 1px;
+}
+.call-end-buttons {
+  display: flex; flex-direction: column; gap: 8px; margin-top: 22px;
+}
+.call-end-btn {
+  width: 100%; padding: 13px; border-radius: 14px;
+  font-size: 15px; font-weight: 500; letter-spacing: 1.5px;
+  cursor: pointer; border: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.call-end-btn:active { opacity: 0.7; transform: scale(0.97); }
+.call-end-btn-primary {
+  background: var(--monet-blue, #7BA5B8); color: #fff;
+}
+.call-end-btn-secondary {
+  background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.75);
+}
+
+/* ── 响应式 · 横屏适配 ── */
+@media (orientation: landscape) {
+  .call-bubbles {
+    padding: 0 32px 8px;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 5%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%);
+  }
+  .call-bubble { max-width: 65%; }
+  .call-actions { gap: 32px; padding: 8px 0 12px; }
+  .call-input-bar { padding: 6px 32px calc(4px + var(--sab, env(safe-area-inset-bottom, 0px))); }
+  .call-top { padding-top: 24px; gap: 2px; }
+  .call-friend-name { font-size: 20px; }
+}

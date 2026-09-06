@@ -1,0 +1,384 @@
+/* ═══════════════ 一起听 · 网易云红白日间模式 ═══════════════ */
+
+.lt-shell {
+  position: absolute; inset: 0; z-index: 1;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, #fdf5f5 0%, #fff5f5 30%, #fefefe 100%);
+  color: #2c2c2c;
+  font-family: var(--font, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif);
+  animation: ltFadeIn 0.35s ease-out;
+  overflow: hidden;
+}
+@keyframes ltFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ─── Block 1: 导航栏 ─── */
+.lt-nav {
+  display: flex; align-items: center;
+  padding: calc(10px + var(--sab, 0px)) 12px 6px;
+  gap: 10px; flex-shrink: 0;
+  background: #fff;
+}
+.lt-nav-back {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,0,0,0.04); border: none;
+  color: #333; font-size: 17px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.2s;
+}
+.lt-nav-back:active { background: rgba(0,0,0,0.1); }
+.lt-nav-title {
+  font-size: 18px; font-weight: 700; letter-spacing: 2px;
+  flex: 1; text-align: center; color: #333;
+}
+/* 删除 ⋯ 按钮  */
+.lt-nav-more { display: none; }
+
+.lt-nav-hint {
+  text-align: center; font-size: 11px; color: #999;
+  letter-spacing: 1px; padding: 0 0 4px; flex-shrink: 0;
+}
+
+/* ─── 角色选择栏 ─── */
+.lt-role-bar {
+  flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+  padding: 4px 16px 6px; background: #fff;
+}
+.lt-role-label {
+  font-size: 12px; color: #999;
+  letter-spacing: 1px; white-space: nowrap;
+}
+.lt-role-select {
+  flex: 1; height: 34px; border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  background: #fafafa; color: #333;
+  padding: 0 12px; font-size: 13px; outline: none;
+}
+.lt-role-select option { color: #111; }
+
+/* ─── Block 2: 双人角色互动区 ─── */
+.lt-hero {
+  flex-shrink: 0; display: flex; flex-direction: column;
+  align-items: center; padding: 6px 16px 0;
+}
+.lt-avatars-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; width: min(100%, 252px);
+  margin: 0 auto;
+}
+.lt-avatar-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  flex: 0 0 76px;
+  min-width: 0;
+}
+.lt-avatar-ring {
+  width: 60px; height: 60px; border-radius: 50%; padding: 2px;
+  background: linear-gradient(135deg, #ec4141, #e03a3a);
+  box-shadow: 0 2px 12px rgba(236,65,65,0.2);
+}
+.lt-avatar-img {
+  width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+  background: #f0f0f0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; overflow: hidden;
+}
+.lt-avatar-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.lt-avatar-label {
+  font-size: 11px; color: #666;
+  letter-spacing: 1px; max-width: 70px;
+  text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ─── 心电连线 ─── */
+.lt-ecg {
+  display: flex; align-items: center; justify-content: center;
+  width: 120px; flex-shrink: 0; position: relative;
+  margin: 0 -8px;
+}
+.lt-ecg svg { width: 100%; height: 32px; overflow: visible; }
+.lt-ecg-line {
+  fill: none; stroke: rgba(236,65,65,0.55);
+  stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 280;
+  stroke-dashoffset: 280;
+  animation: ecgScan 2.4s ease-in-out infinite;
+}
+@keyframes ecgScan {
+  0%   { stroke-dashoffset: 280; stroke: rgba(236,65,65,0.25); }
+  12%  { stroke: rgba(236,65,65,0.85); }
+  55%  { stroke-dashoffset: -20; stroke: rgba(236,65,65,0.45); }
+  88%  { stroke: rgba(236,65,65,0.85); }
+  100% { stroke-dashoffset: 280; stroke: rgba(236,65,65,0.25); }
+}
+
+/* ─── 角色气泡 ─── */
+.lt-friend-bubble {
+  background: #fef0f0; border-radius: 12px;
+  padding: 6px 12px; font-size: 12px; color: #666;
+  max-width: 180px; text-align: center; margin-top: 4px;
+  position: relative; letter-spacing: 0.5px; line-height: 1.4;
+  border: 1px solid #fce4e4;
+}
+
+/* ─── Block 3: CD唱片（缩小 + 图片铺满） ─── */
+.lt-vinyl-area {
+  flex-shrink: 0; display: flex; flex-direction: column;
+  align-items: center; padding: 4px 0 0;
+}
+.lt-disc-large {
+  width: min(180px, 46vw); height: min(180px, 46vw);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #2a2a2a 0 8%, #1a1a1a 9% 16%, #333 17% 42%, #222 43% 48%, #2a2a2a 49% 54%, #1a1a1a 55% 62%, #2d2d2d 63% 100%);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.lt-disc-large.playing {
+  animation: vinylSpin 6s linear infinite;
+}
+@keyframes vinylSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.lt-disc-large-inner {
+  position: absolute;
+  width: 56%; height: 56%; border-radius: 50%;
+  left: 50%; top: 50%; transform: translate(-50%, -50%);
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  background: #111;
+  z-index: 1;
+}
+.lt-disc-large-inner img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+}
+.lt-disc-large-icon {
+  stroke: rgba(255,255,255,0.4); fill: none;
+  stroke-width: 1.2; width: 36px; height: 36px;
+  position: relative; z-index: 2;
+}
+.lt-disc-hole {
+  position: absolute; width: 6px; height: 6px; border-radius: 50%;
+  background: #1a1a1a; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+/* ─── 歌曲信息 ─── */
+.lt-track-info {
+  text-align: center; padding: 6px 20px 0; flex-shrink: 0;
+}
+.lt-track-name {
+  font-size: 14px; font-weight: 600; color: #333;
+  letter-spacing: 0.5px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lt-track-artist {
+  font-size: 11px; color: #999; margin-top: 2px;
+}
+
+/* ─── 一起听时长 ─── */
+.lt-listen-time {
+  text-align: center; padding: 6px 20px 2px; flex-shrink: 0;
+  font-size: 12px; color: #ec4141; letter-spacing: 0.5px;
+  opacity: 0.85;
+}
+
+/* ─── 歌词区域 ─── */
+.lt-lyrics-area {
+  flex-shrink: 0; text-align: center;
+  padding: 4px 20px 2px;
+  min-height: 46px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+}
+.lt-lyric-line {
+  font-size: 13px; font-weight: 400;
+  letter-spacing: 1px; line-height: 1.4;
+  transition: color 0.4s;
+}
+.lt-lyric-current { color: #333; font-weight: 500; }
+.lt-lyric-next { color: #ccc; font-size: 11px; }
+.lt-lyric-empty { color: #ccc; font-size: 11px; letter-spacing: 1px; }
+
+/* ─── Block 4: 播放控制（无 ⋯ 按钮） ─── */
+.lt-music-ctrl {
+  flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; gap: 0; padding: 6px 14px 4px;
+}
+.lt-ctrl-container {
+  display: flex; align-items: center; gap: 12px;
+  background: #fafafa; border-radius: 22px;
+  border: 1px solid #eee;
+  padding: 6px 14px;
+}
+/* 删除 ⋯ 按钮  */
+.lt-ctrl-dot { display: none; }
+
+.lt-ctrl-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: transparent;
+  color: #666; font-size: 13px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.lt-ctrl-btn:hover { color: #333; }
+.lt-ctrl-btn:active { background: #f0f0f0; transform: scale(0.92); }
+.lt-ctrl-btn svg { fill: currentColor; stroke: currentColor; }
+.lt-ctrl-main {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, #ec4141, #e03a3a);
+  color: #fff; font-size: 16px;
+  box-shadow: 0 3px 12px rgba(236,65,65,0.3);
+}
+.lt-ctrl-main:hover { background: linear-gradient(135deg, #f04a4a, #e54444); }
+.lt-ctrl-main:active { transform: scale(0.92); }
+
+/* ─── Block 5: 聊天对话流区域 ─── */
+
+/* ─── Block 6: 底部输入栏(自适应，不遮挡播放器) ─── */
+
+/* ─── CD 上传提示 ─── */
+.lt-disc-uploadable {
+  cursor: pointer; position: relative;
+}
+.lt-disc-uploadable::after {
+  content: '点击更换封面';
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.4); color: rgba(255,255,255,0.8);
+  font-size: 10px; letter-spacing: 1px; border-radius: 50%;
+  opacity: 0; transition: opacity 0.2s;
+  pointer-events: none; z-index: 5;
+}
+.lt-disc-uploadable:hover::after,
+.lt-disc-uploadable:active::after { opacity: 1; }
+
+/* ─── 瞬态气泡（横向排列，在头像下方，支持堆叠） ─── */
+.lt-transient-bubble {
+  position: absolute; top: calc(100% + 6px + var(--bubble-offset, 0px)); left: 50%;
+  transform: translateX(-50%);
+  background: #fff; color: #333;
+  border-radius: 10px; padding: 6px 10px;
+  font-size: 11px; letter-spacing: 0.5px;
+  line-height: 1.4; max-width: 160px;
+  text-align: center; white-space: normal;
+  overflow-wrap: break-word; word-break: normal;
+  animation: ltBubblePop 3.5s ease-out forwards;
+  pointer-events: auto; z-index: 5;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+.lt-transient-bubble::after {
+  content: ''; position: absolute; bottom: 100%; left: 50%;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid rgba(0,0,0,0.06);
+}
+@keyframes ltBubblePop {
+  0% { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.92); }
+  15% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+}
+
+/* ─── 聊天输入弹窗 ─── */
+
+/* ─── 角色选择弹窗 ─── */
+.lt-char-pick-overlay {
+  position: fixed; inset: 0; z-index: 10100;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  animation: ltFadeIn 0.25s ease-out;
+}
+.lt-char-pick-card {
+  width: min(320px, 86vw); background: #fff;
+  border-radius: 18px; padding: 24px 18px 18px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+}
+.lt-char-pick-title {
+  text-align: center; font-size: 16px; font-weight: 600;
+  margin-bottom: 16px; letter-spacing: 1px; color: #333;
+}
+.lt-char-pick-list {
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 50vh; overflow-y: auto;
+}
+.lt-char-pick-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 12px;
+  background: #fafafa; cursor: pointer;
+  transition: background 0.15s;
+}
+.lt-char-pick-item:active { background: #f0f0f0; }
+.lt-char-pick-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: #f0f0f0;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.lt-char-pick-avatar img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+}
+.lt-char-pick-name { font-size: 14px; color: #333; }
+.lt-char-pick-cancel {
+  display: block; margin: 12px auto 0; padding: 8px 24px;
+  border-radius: 14px; border: 1px solid #e0e0e0;
+  background: transparent; color: #999;
+  font-size: 12px; cursor: pointer;
+}
+
+/* ─── 横屏模式：左侧CD+控制，右侧聊天 ─── */
+@media (orientation: landscape) and (max-height: 500px) {
+  .lt-shell {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .lt-nav, .lt-role-bar, .lt-nav-hint {
+    width: 100%;
+    flex-basis: 100%;
+  }
+  .lt-hero {
+    flex: 0 0 40%;
+    max-width: 40%;
+    overflow-y: auto;
+  }
+  .lt-vinyl-area {
+    flex: 0 0 40%;
+    max-width: 40%;
+    padding: 2px 0;
+  }
+  .lt-disc-large {
+    width: min(120px, 32vw);
+    height: min(120px, 32vw);
+  }
+  .lt-lyrics-area {
+    flex: 0 0 40%;
+    max-width: 40%;
+    min-height: 30px;
+  }
+  .lt-track-info {
+    flex: 0 0 40%;
+    max-width: 40%;
+  }
+  .lt-music-ctrl {
+    flex: 0 0 40%;
+    max-width: 40%;
+  }
+}
+/* ═══════ 全屏模式 ═══════ */
+#listenTogetherApp.lt-fullscreen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: #fefefe;
+}
+#listenTogetherApp.lt-fullscreen .lt-shell {
+  position: absolute; inset: 0;
+  height: 100vh; height: 100dvh;
+}
+
+/* ─── 暗色模式适配 ─── */
+@media (prefers-color-scheme: light) {
+  .lt-shell { background: linear-gradient(180deg, #fdf5f5 0%, #fff5f5 30%, #fefefe 100%); }
+}

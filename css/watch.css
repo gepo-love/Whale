@@ -1,0 +1,249 @@
+/**
+ * 小手机 · 陪看模式样式
+ */
+
+/* ─── 全页容器：视频 App 风格 ─── */
+.watch-app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #edf6fb;
+  color: #2f4654;
+}
+
+.watch-player-band {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #d8e9f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(90,128,148,0.18);
+  transition: aspect-ratio 0.2s ease;
+  /* 防止发消息时视频被键盘/布局变化挤走 */
+  min-height: 0;
+  overflow: hidden;
+  contain: layout style paint;
+}
+
+.watch-player-band.portrait {
+  aspect-ratio: 9 / 13;
+  max-height: 48%;
+}
+
+.watch-empty-player {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: rgba(47,70,84,0.62);
+  cursor: pointer;
+  background: radial-gradient(circle at 50% 35%, rgba(143,175,191,0.32), transparent 42%), #d8e9f2;
+}
+
+.watch-video {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border-radius: 0;
+  background: #d8e9f2;
+  outline: none;
+  object-fit: contain;
+  /* GPU 合成层隔离：发消息/布局变化时视频不受影响 */
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.watch-control-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.72);
+  border-bottom: 1px solid rgba(90,128,148,0.14);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.watch-control-strip::-webkit-scrollbar { display: none; }
+
+.watch-select,
+.watch-mini-file,
+.watch-pill-btn {
+  height: 32px;
+  border-radius: 16px;
+  border: 1px solid rgba(90,128,148,0.18);
+  background: rgba(255,255,255,0.78);
+  color: #385366;
+  padding: 0 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.watch-select option { color: #111; }
+.watch-mini-file,
+.watch-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.watch-pill-btn.active {
+  background: #6e919f;
+  border-color: #6e919f;
+  color: #fff;
+}
+
+.watch-file-info {
+  padding: 6px 14px 0;
+  font-size: 11px;
+  color: #7d93a2;
+  flex-shrink: 0;
+}
+
+/* ─── 字幕状态 ─── */
+.watch-sub-status {
+  padding: 4px 14px 2px;
+  font-size: 11px;
+  color: #7d93a2;
+  flex-shrink: 0;
+}
+.watch-sub-status.active {
+  color: #4a8bb5;
+}
+.watch-sub-status.hint {
+  color: #9cb0bc;
+  font-style: italic;
+}
+
+/* ─── 字幕导入按钮 ─── */
+.watch-mini-file.sub-import {
+  background: rgba(245, 247, 248, 0.85);
+  border: 1px dashed rgba(143, 175, 191, 0.45);
+  color: #8fafbf;
+  font-size: 11px;
+}
+
+.watch-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px calc(10px + var(--sab, 0px));
+  background: rgba(255,255,255,0.82);
+  border-top: 1px solid rgba(90,128,148,0.14);
+  flex-shrink: 0;
+}
+.watch-chat-input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  border-radius: 18px;
+  border: 1px solid rgba(90,128,148,0.18);
+  background: #fff;
+  color: #2f4654;
+  padding: 0 12px;
+  outline: none;
+  font-family: inherit;
+}
+.watch-chat-input::placeholder { color: #9cb0bc; }
+.watch-send-btn,
+.watch-icon-btn {
+  height: 36px;
+  border-radius: 18px;
+  border: none;
+  background: #8fafbf;
+  color: #fff;
+  padding: 0 14px;
+  font-size: 12px;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.watch-icon-btn {
+  width: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── 回复区 ─── */
+.watch-reply-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: #edf6fb;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.watch-reply-user,
+.watch-reply-ai {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+}
+
+.watch-reply-user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.watch-reply-ai {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.watch-reply-bubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: break-word; word-break: normal;
+  letter-spacing: 0.3px;
+}
+
+.watch-reply-user .watch-reply-bubble {
+  background: #8fafbf;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.watch-reply-ai .watch-reply-bubble {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #2f4654;
+  border: 0.5px solid rgba(90,128,148,0.12);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 6px rgba(44,62,80,0.04);
+}
+
+.watch-reply-time {
+  font-size: 10px;
+  color: var(--ink-subtle);
+  margin-top: 2px;
+  padding: 0 4px;
+}
+
+/* ─── 底部提示 ─── */
+.watch-note {
+  font-size: 11px;
+  color: #7d93a2;
+  padding: 0 12px 8px;
+  border-top: none;
+  margin-top: 0;
+  line-height: 1.5;
+}
+
+/* ─── 桌面卡片 (第三页) ─── */
+.watch-app-card {
+  background: linear-gradient(135deg, rgba(143,175,191,0.22), rgba(110,145,159,0.22));
+}

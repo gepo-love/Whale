@@ -1,0 +1,27 @@
+{
+  "name": "鲸鱼机",
+  "short_name": "鲸鱼机",
+  "description": "鲸鱼机 · AI 角色聊天、查手机、写工具",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#7BA5B8",
+  "background_color": "#F5F0E8",
+  "lang": "zh-CN",
+  "categories": ["social", "entertainment"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

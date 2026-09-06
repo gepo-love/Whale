@@ -1,0 +1,191 @@
+/* 闲置售卖：浅蓝高级简约风 */
+#secondhandApp { background:#f3f7fb; }
+#secondhandApp .secondhand-shell { display:flex; flex-direction:column; height:100%; min-height:0; color:#243447; background:#f3f7fb; }
+#secondhandApp .secondhand-main { flex:1; min-height:0; overflow-y:auto; }
+#secondhandApp .secondhand-topbar { display:flex; align-items:center; gap:10px; padding:12px 16px; background:#fff; border-bottom:1px solid #dce8f2; }
+#secondhandApp .secondhand-brand { flex:1; font-size:18px; font-weight:700; letter-spacing:1px; color:#183b56; }
+#secondhandApp .secondhand-brand small { display:block; margin-top:2px; font-size:10px; color:#7c9aae; font-weight:400; letter-spacing:.5px; }
+#secondhandApp .secondhand-icon-btn { width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #d7e5ef; border-radius:50%; background:#fff; color:#53768c; cursor:pointer; }
+/* ★ SVG 图标必须有尺寸+描边样式：否则 circle 元素按默认黑色填充+300×150 渲染成黑色大圆 */
+#secondhandApp .secondhand-icon-btn svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+#secondhandApp .secondhand-search svg { width:15px; height:15px; flex:none; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+#secondhandApp .secondhand-fab svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+#secondhandApp .secondhand-icon-btn:active { background:#eaf4fb; }
+#secondhandApp .secondhand-search { display:flex; align-items:center; gap:8px; margin:12px 14px 8px; padding:0 12px; height:38px; background:#e8f2f9; border:1px solid #d4e5f0; border-radius:19px; }
+#secondhandApp .secondhand-search input { flex:1; min-width:0; border:0; outline:0; background:transparent; color:#244255; font:inherit; font-size:13px; }
+#secondhandApp .secondhand-search button { border:0; background:transparent; color:#5c8298; cursor:pointer; }
+#secondhandApp .secondhand-cats { display:flex; gap:8px; padding:0 14px 12px; overflow-x:auto; }
+#secondhandApp .secondhand-cats::-webkit-scrollbar { display:none; }
+#secondhandApp .secondhand-cat { flex:0 0 auto; padding:7px 12px; border:1px solid #d2e2ed; border-radius:16px; background:#fff; color:#66869a; font-size:12px; cursor:pointer; }
+#secondhandApp .secondhand-cat.active { background:#d9edf9; border-color:#9ac8e4; color:#205d80; font-weight:600; }
+#secondhandApp .secondhand-feed { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:0 12px 20px; }
+#secondhandApp .secondhand-product { overflow:hidden; border:1px solid #dce8f2; border-radius:8px; background:#fff; cursor:pointer; }
+#secondhandApp .secondhand-product:active { transform:translateY(1px); }
+#secondhandApp .secondhand-product-image { display:flex; align-items:center; justify-content:center; aspect-ratio:1.15; padding:12px; box-sizing:border-box; background:#e8f3f9; color:#5d7c8d; font-size:12px; line-height:1.55; text-align:center; }
+#secondhandApp .secondhand-product-image span { display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:5; }
+#secondhandApp .secondhand-product-image img { width:100%; height:100%; object-fit:cover; }
+#secondhandApp .secondhand-product-info { padding:9px; }
+#secondhandApp .secondhand-product-title { min-height:34px; color:#253f50; font-size:13px; line-height:1.35; }
+#secondhandApp .secondhand-price { margin-top:7px; color:#1f719d; font-size:17px; font-weight:700; }
+#secondhandApp .secondhand-price span { margin-right:2px; font-size:11px; font-weight:500; }
+#secondhandApp .secondhand-meta { display:flex; justify-content:space-between; gap:5px; margin-top:6px; color:#92a8b5; font-size:10px; }
+#secondhandApp .secondhand-empty { padding:60px 20px; text-align:center; color:#8da5b4; font-size:13px; }
+#secondhandApp .secondhand-fab { position:fixed; right:20px; bottom:calc(76px + var(--sab,0px)); z-index:5; display:inline-flex; align-items:center; gap:6px; padding:11px 15px; border:0; border-radius:20px; background:#4e9ac0; color:#fff; box-shadow:0 4px 14px rgba(45,105,138,.22); font-size:12px; cursor:pointer; }
+#secondhandApp .secondhand-section { margin:12px 14px; }
+#secondhandApp .secondhand-section-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; color:#23465b; font-size:14px; font-weight:700; }
+#secondhandApp .secondhand-section-title button { border:0; background:transparent; color:#4e91b5; font-size:11px; cursor:pointer; }
+#secondhandApp .secondhand-local-banner { margin:14px; padding:15px; border:1px solid #cfe1ed; border-radius:8px; background:#eaf5fb; }
+#secondhandApp .secondhand-local-banner strong { display:block; color:#21516c; font-size:15px; }
+#secondhandApp .secondhand-local-banner span { display:block; margin-top:5px; color:#6f8e9f; font-size:11px; }
+#secondhandApp .secondhand-list { display:flex; flex-direction:column; gap:8px; }
+#secondhandApp .secondhand-list-row { display:flex; align-items:center; gap:10px; padding:11px; border:1px solid #dce8f2; border-radius:8px; background:#fff; }
+#secondhandApp .secondhand-thumb { display:flex; align-items:center; justify-content:center; width:48px; height:48px; flex:none; padding:4px; box-sizing:border-box; border-radius:6px; background:#e8f3f9; color:#6e94a8; font-size:9px; line-height:1.35; text-align:center; }
+#secondhandApp .secondhand-row-main { flex:1; min-width:0; }
+#secondhandApp .secondhand-row-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#2b4b5e; font-size:13px; }
+#secondhandApp .secondhand-row-sub { margin-top:4px; color:#8aa1ae; font-size:10px; }
+#secondhandApp .secondhand-row-action { flex:none; padding:7px 10px; border:1px solid #a9cfe3; border-radius:5px; background:#f7fbfd; color:#34779a; font-size:11px; cursor:pointer; }
+#secondhandApp .secondhand-row-action.primary { background:#4e9ac0; color:#fff; border-color:#4e9ac0; }
+#secondhandApp .secondhand-dock { display:grid; grid-template-columns:repeat(4,1fr); flex:none; padding-bottom:var(--sab,0px); background:#fff; border-top:1px solid #d9e7f0; }
+#secondhandApp .secondhand-dock-btn { display:flex; flex-direction:column; align-items:center; gap:4px; padding:9px 4px 7px; border:0; background:transparent; color:#8ba1ae; font-size:10px; cursor:pointer; }
+#secondhandApp .secondhand-dock-btn svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+#secondhandApp .secondhand-dock-btn.active { color:#3f88ad; font-weight:700; }
+#secondhandApp .secondhand-profile-head { padding:20px 16px 18px; background:#fff; border-bottom:1px solid #dce8f2; }
+#secondhandApp .secondhand-profile-line { display:flex; align-items:center; gap:12px; }
+#secondhandApp .secondhand-avatar { display:flex; align-items:center; justify-content:center; width:60px; height:60px; flex:none; overflow:hidden; border:3px solid #e0f0f7; border-radius:50%; background:#d9edf6; color:#397898; font-size:30px; cursor:pointer; }
+#secondhandApp .secondhand-avatar img { width:100%; height:100%; object-fit:cover; }
+#secondhandApp .secondhand-profile-name { color:#203f52; font-size:18px; font-weight:700; }
+#secondhandApp .secondhand-profile-bio { margin-top:4px; color:#7b96a5; font-size:11px; line-height:1.4; }
+#secondhandApp .secondhand-wallet { display:flex; gap:8px; margin-top:16px; }
+#secondhandApp .secondhand-wallet-item { flex:1; padding:10px 12px; border:1px solid #d9e8f1; border-radius:6px; background:#f7fbfd; }
+#secondhandApp .secondhand-wallet-item span { display:block; color:#8aa1ae; font-size:10px; }
+#secondhandApp .secondhand-wallet-item strong { display:block; margin-top:4px; color:#2c7398; font-size:16px; }
+#secondhandApp .secondhand-settings { padding:14px; }
+#secondhandApp .secondhand-form { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+#secondhandApp .secondhand-form label { color:#5c7c8d; font-size:11px; }
+#secondhandApp .secondhand-form input, #secondhandApp .secondhand-form textarea, #secondhandApp .secondhand-form select { box-sizing:border-box; width:100%; border:1px solid #cbdfe9; border-radius:5px; outline:0; background:#fff; color:#29495b; padding:9px 10px; font:inherit; font-size:13px; }
+#secondhandApp .secondhand-form textarea { min-height:72px; resize:vertical; }
+#secondhandApp .secondhand-checks { display:flex; flex-direction:column; gap:7px; max-height:180px; overflow-y:auto; padding:9px; border:1px solid #dce8f2; border-radius:5px; background:#f8fbfd; }
+#secondhandApp .secondhand-checks label { display:flex; align-items:center; gap:7px; color:#45677a; font-size:12px; }
+#secondhandApp .secondhand-checks input { width:auto; }
+#secondhandApp .secondhand-primary { width:100%; padding:11px 14px; border:0; border-radius:5px; background:#4e9ac0; color:#fff; font-size:13px; cursor:pointer; }
+#secondhandApp .secondhand-secondary { padding:9px 12px; border:1px solid #bad7e5; border-radius:5px; background:#fff; color:#447891; font-size:12px; cursor:pointer; }
+#secondhandApp .secondhand-modal-bg { position:fixed; inset:0; z-index:30; display:flex; align-items:flex-end; justify-content:center; background:rgba(27,58,78,.36); }
+#secondhandApp .secondhand-modal { width:min(100%,500px); max-height:88vh; overflow-y:auto; padding:18px 16px calc(18px + var(--sab,0px)); border-radius:14px 14px 0 0; background:#fff; box-shadow:0 -6px 22px rgba(34,75,99,.18); }
+#secondhandApp .secondhand-modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; color:#21475d; font-size:16px; font-weight:700; }
+#secondhandApp .secondhand-modal-close { border:0; background:transparent; color:#7894a2; font-size:22px; cursor:pointer; }
+#secondhandApp .secondhand-detail-image { display:flex; align-items:center; justify-content:center; height:180px; margin:-18px -16px 14px; padding:20px; box-sizing:border-box; background:#e8f3f9; color:#5d7c8d; font-size:13px; line-height:1.6; text-align:center; }
+#secondhandApp .secondhand-detail-image img { width:100%; height:100%; object-fit:cover; }
+#secondhandApp .secondhand-detail-title { color:#203f52; font-size:19px; font-weight:700; line-height:1.35; }
+#secondhandApp .secondhand-detail-desc { margin:11px 0; color:#587687; font-size:13px; line-height:1.6; white-space:pre-wrap; }
+#secondhandApp .secondhand-detail-buy { display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:12px; border-top:1px solid #e3edf3; }
+#secondhandApp .secondhand-detail-buy .secondhand-primary { width:auto; min-width:120px; }
+#secondhandApp .secondhand-message { display:flex; flex-direction:column; gap:8px; padding:10px 14px; border-bottom:1px solid #e1edf3; background:#fff; cursor:pointer; }
+#secondhandApp .secondhand-message-title { display:flex; align-items:center; justify-content:space-between; color:#31566b; font-size:13px; font-weight:600; }
+#secondhandApp .secondhand-message-actions { display:flex; align-items:center; gap:7px; }
+#secondhandApp .secondhand-message-delete { width:22px; height:22px; border:0; border-radius:50%; background:transparent; color:#9aabb4; font-size:17px; line-height:20px; cursor:pointer; }
+#secondhandApp .secondhand-message-delete:hover { background:#f3e6e4; color:#b86161; }
+#secondhandApp .secondhand-message-preview { overflow:hidden; color:#86a0ae; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+#secondhandApp .secondhand-message-time { color:#a0b3be; font-size:10px; font-weight:400; }
+#secondhandApp .secondhand-chat-modal { max-height:92vh; }
+#secondhandApp .secondhand-chat-avatar { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:#dceef6; color:#467d99; font-size:10px; vertical-align:middle; }
+#secondhandApp .secondhand-chat-body { max-height:52vh; overflow-y:auto; padding:4px 0 10px; }
+#secondhandApp .secondhand-chat-line { display:flex; align-items:flex-start; gap:7px; margin:8px 0; color:#496b7b; font-size:14px; line-height:1.6; }
+#secondhandApp .secondhand-chat-line > div { max-width:78%; padding:8px 10px; border-radius:7px; background:#f2f7f9; word-break:break-word; }
+#secondhandApp .secondhand-typing-text { padding:6px 10px; border-radius:7px; background:#f5f9fb; color:#a9bcc6; font-size:10px; }
+/* 角色商品标识徽章 */
+#secondhandApp .secondhand-role-tag { display:inline-block; padding:1px 7px; border-radius:8px; background:rgba(143,175,191,0.16); color:#5d8ba0; font-size:10px; font-weight:600; }
+#secondhandApp .secondhand-chat-line.mine { flex-direction:row-reverse; }
+#secondhandApp .secondhand-chat-line.mine > div { background:#e2f2f9; }
+#secondhandApp .secondhand-chat-product { display:flex; gap:10px; margin:8px 0; padding:10px; border:1px solid #cfe3ed; border-radius:7px; background:#f7fbfd; }
+#secondhandApp .secondhand-chat-product-image { display:flex; align-items:center; justify-content:center; width:72px; height:72px; flex:none; padding:7px; box-sizing:border-box; border-radius:5px; background:#e5f1f6; color:#5d7c8d; font-size:10px; line-height:1.4; text-align:center; }
+#secondhandApp .secondhand-chat-product-main { display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; color:#496b7b; font-size:11px; }
+#secondhandApp .secondhand-chat-product-main strong { color:#2f596e; font-size:13px; }
+#secondhandApp .secondhand-chat-product-main span { line-height:1.4; }
+#secondhandApp .secondhand-chat-product-main b { color:#2e82a5; font-size:14px; }
+#secondhandApp .secondhand-chat-product-action { align-self:flex-start; padding:5px 10px; border:1px solid #8fc1d8; border-radius:4px; background:#fff; color:#347c9f; font-size:11px; cursor:pointer; }
+#secondhandApp .secondhand-chat-product-actions { display:flex; flex-wrap:wrap; gap:6px; }
+#secondhandApp .secondhand-chat-product-status { color:#8aa2ad; }
+#secondhandApp .secondhand-chat-system-card { margin:9px 0; padding:10px; border:1px solid #cfe3ed; border-radius:6px; background:#edf7fb; color:#477185; font-size:11px; line-height:1.5; text-align:center; }
+#secondhandApp .secondhand-chat-system-card button { display:block; margin:7px auto 0; padding:6px 13px; border:0; border-radius:4px; background:#4e9ac0; color:#fff; font-size:11px; cursor:pointer; }
+#secondhandApp .secondhand-chat-toolbar { display:flex; align-items:center; gap:7px; padding-top:9px; border-top:1px solid #e0edf3; }
+#secondhandApp .secondhand-chat-toolbar input { flex:1; min-width:0; border:1px solid #cbdfe9; border-radius:5px; outline:0; padding:9px; color:#29495b; font:inherit; font-size:12px; }
+#secondhandApp .secondhand-chat-play { width:34px; height:34px; border:1px solid #c4dce8; border-radius:50%; background:#fff; color:#4b829d; cursor:pointer; }
+#secondhandApp .secondhand-chat-page { display:flex; flex-direction:column; height:100%; min-height:0; background:#f3f7fb; }
+#secondhandApp .secondhand-chat-page-head { display:flex; align-items:center; gap:10px; flex:none; padding:10px 14px; background:#fff; border-bottom:1px solid #dce8f2; }
+#secondhandApp .secondhand-chat-page-head > div { flex:1; min-width:0; }
+#secondhandApp .secondhand-chat-page-head strong { display:block; overflow:hidden; color:#244b61; font-size:14px; text-overflow:ellipsis; white-space:nowrap; }
+#secondhandApp .secondhand-chat-page-head small { display:block; margin-top:3px; color:#89a1ae; font-size:10px; }
+#secondhandApp .secondhand-chat-page-body { flex:1; min-height:0; overflow-y:auto; padding:12px 14px 18px; }
+#secondhandApp .secondhand-chat-page-toolbar { display:flex; align-items:center; gap:7px; flex:none; padding:9px 12px calc(9px + var(--sab,0px)); background:#fff; border-top:1px solid #dce8f2; }
+#secondhandApp .secondhand-chat-page-toolbar input { flex:1; min-width:0; border:1px solid #cbdfe9; border-radius:5px; outline:0; padding:10px; color:#29495b; font:inherit; font-size:12px; }
+#secondhandApp .secondhand-chat-typing { display:flex; align-items:flex-start; gap:7px; margin:8px 0; }
+#secondhandApp .secondhand-typing-dots { display:flex; align-items:center; gap:4px; padding:8px 12px; border-radius:7px; background:#f2f7f9; }
+#secondhandApp .secondhand-typing-dots span { display:inline-block; width:5px; height:5px; border-radius:50%; background:#7c98a6; animation:secondhand-typing-bounce 1.4s infinite ease-in-out both; }
+#secondhandApp .secondhand-typing-dots span:nth-child(1) { animation-delay:-0.32s; }
+#secondhandApp .secondhand-typing-dots span:nth-child(2) { animation-delay:-0.16s; }
+@keyframes secondhand-typing-bounce { 0%, 80%, 100% { transform:scale(0.8); opacity:0.5; } 40% { transform:scale(1); opacity:1; } }
+/* ── 刷新按钮 + 下拉提示 ── */
+#secondhandApp .secondhand-icon-btn.secondhand-refreshing svg { animation:secondhand-spin 0.7s linear infinite; }
+@keyframes secondhand-spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+.secondhand-pull-hint { position:absolute; top:0; left:50%; z-index:8; padding:5px 14px; border-radius:0 0 12px 12px; background:#e9f3f9; color:#5d7c8d; font-size:11px; box-shadow:0 2px 8px rgba(60,110,135,0.12); transform:translate(-50%,-30px); pointer-events:none; }
+
+/* ── 发货浮层通知 ── */
+.secondhand-float-notice { position:fixed; top:calc(12px + var(--safe-top,0px)); left:50%; transform:translateX(-50%); z-index:9999; display:flex; align-items:center; gap:10px; width:min(340px, calc(100vw - 32px)); padding:11px 12px; box-sizing:border-box; border:1px solid #cfe3ed; border-radius:10px; background:#fff; box-shadow:0 8px 28px rgba(60,110,135,0.28); cursor:pointer; animation:secondhand-float-in 0.28s ease-out; }
+.secondhand-float-notice-icon { font-size:22px; flex:none; }
+.secondhand-float-notice-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.secondhand-float-notice-main strong { color:#244b61; font-size:13px; }
+.secondhand-float-notice-main span { overflow:hidden; color:#6c8a9a; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.secondhand-float-notice-close { flex:none; width:22px; height:22px; border:0; border-radius:50%; background:#eef4f8; color:#7c98a6; font-size:13px; line-height:1; cursor:pointer; }
+@keyframes secondhand-float-in { from { opacity:0; transform:translate(-50%,-12px); } to { opacity:1; transform:translate(-50%,0); } }
+
+@media (max-width:360px) { #secondhandApp .secondhand-feed { gap:7px; padding-left:8px; padding-right:8px; } #secondhandApp .secondhand-product-info { padding:7px; } }
+
+/* 与主聊天页共用的低对比度文字层级；拍卖会沿用同一套表面色。 */
+#secondhandApp .secondhand-shell { color:var(--ink,#2f3437); background:var(--surface-page,#f7f6f2); }
+#secondhandApp .secondhand-main, #secondhandApp .secondhand-chat-page { background:var(--surface-page,#f7f6f2); }
+#secondhandApp .secondhand-topbar, #secondhandApp .secondhand-profile-head, #secondhandApp .secondhand-chat-page-head, #secondhandApp .secondhand-chat-page-toolbar, #secondhandApp .secondhand-dock { background:var(--surface-card,#fff); border-color:var(--border-separator,#e5e1db); }
+#secondhandApp .secondhand-brand, #secondhandApp .secondhand-section-title, #secondhandApp .secondhand-profile-name { color:var(--ink,#2f3437); }
+#secondhandApp .secondhand-brand small, #secondhandApp .secondhand-profile-bio, #secondhandApp .secondhand-row-sub, #secondhandApp .secondhand-meta { color:var(--ink-subtle,#91979b); }
+#secondhandApp .secondhand-product, #secondhandApp .secondhand-list-row, #secondhandApp .secondhand-message { background:var(--surface-card,#fff); border-color:var(--border-light,#e6e2dc); }
+#secondhandApp .secondhand-product-image, #secondhandApp .secondhand-thumb, #secondhandApp .secondhand-chat-product-image { background:var(--surface-input,#f1f2f0); color:var(--ink-light,#686f73); }
+#secondhandApp .secondhand-product-title, #secondhandApp .secondhand-row-title, #secondhandApp .secondhand-chat-product-main strong { color:var(--ink-light,#4c5357); }
+#secondhandApp .secondhand-chat-line, #secondhandApp .secondhand-chat-product-main, #secondhandApp .secondhand-detail-desc { color:var(--ink-light,#686f73); font-size:13px; }
+#secondhandApp .secondhand-price, #secondhandApp .secondhand-chat-product-main b { color:var(--monet-blue,#5689a8); }
+#secondhandApp .secondhand-product-image span, #secondhandApp .secondhand-thumb span, #secondhandApp .secondhand-chat-product-image span { display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:4; max-width:100%; word-break:break-word; }
+#secondhandApp .secondhand-chat-product-image { overflow:hidden; }
+#secondhandApp .secondhand-dock { grid-template-columns:repeat(5,1fr); }
+#secondhandApp .secondhand-dock-btn.auction-btn { position:relative; z-index:2; transform:translateY(-12px); width:54px; height:54px; justify-self:center; padding:10px 4px 6px; border:4px solid var(--surface-page,#f7f6f2); border-radius:50%; background:var(--monet-blue,#5689a8); color:#fff; box-shadow:0 4px 12px rgba(55,80,90,.22); }
+#secondhandApp .secondhand-dock-btn.auction-btn svg { width:22px; height:22px; }
+#secondhandApp .secondhand-dock-btn.auction-btn span { font-size:10px; }
+#secondhandApp .secondhand-auction-list { display:flex; flex-direction:column; gap:10px; padding:14px; }
+#secondhandApp .secondhand-auction-card { display:flex; gap:11px; padding:10px; border:1px solid var(--border-light,#e6e2dc); border-radius:8px; background:var(--surface-card,#fff); }
+#secondhandApp .secondhand-auction-image { position:relative; display:flex; align-items:center; justify-content:center; width:92px; min-height:92px; flex:none; overflow:hidden; padding:8px; box-sizing:border-box; border-radius:6px; background:var(--surface-input,#f1f2f0); color:var(--ink-subtle,#82898d); text-align:center; font-size:11px; line-height:1.45; }
+#secondhandApp .secondhand-auction-image span { display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:5; }
+#secondhandApp .secondhand-auction-image b { position:absolute; top:5px; left:5px; color:var(--monet-blue,#5689a8); font-size:9px; }
+#secondhandApp .secondhand-auction-main { display:flex; flex:1; min-width:0; flex-direction:column; }
+#secondhandApp .secondhand-auction-main strong { color:var(--ink,#2f3437); font-size:14px; }
+#secondhandApp .secondhand-auction-main p { flex:1; margin:5px 0; color:var(--ink-subtle,#82898d); font-size:11px; line-height:1.5; }
+#secondhandApp .secondhand-auction-main div { display:flex; align-items:center; justify-content:space-between; gap:8px; color:var(--monet-blue,#5689a8); font-size:12px; }
+#secondhandApp .secondhand-auction-main button, #secondhandApp .secondhand-auction-controls button { padding:7px 10px; border:1px solid var(--border-light,#d9d5cf); border-radius:5px; background:var(--surface-card,#fff); color:var(--monet-blue,#5689a8); font-size:11px; cursor:pointer; }
+#secondhandApp .secondhand-auction-room { display:flex; flex-direction:column; height:100%; min-height:0; background:var(--surface-page,#f7f6f2); }
+#secondhandApp .secondhand-auction-stage { margin:14px; padding:14px; border:1px solid var(--border-light,#e6e2dc); border-radius:8px; background:var(--surface-card,#fff); }
+#secondhandApp .secondhand-auction-stage-image { display:flex; align-items:center; justify-content:center; min-height:125px; padding:18px; box-sizing:border-box; background:var(--surface-input,#f1f2f0); color:var(--ink-subtle,#82898d); text-align:center; font-size:13px; line-height:1.55; }
+#secondhandApp .secondhand-auction-stage-image span { display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:6; }
+#secondhandApp .secondhand-auction-stage p { margin:10px 0; color:var(--ink-light,#686f73); font-size:13px; line-height:1.55; }
+#secondhandApp .secondhand-auction-price { display:grid; grid-template-columns:auto 1fr; align-items:end; gap:3px 9px; padding-top:10px; border-top:1px solid var(--border-separator,#e5e1db); }
+#secondhandApp .secondhand-auction-price span { color:var(--ink-subtle,#91979b); font-size:11px; }
+#secondhandApp .secondhand-auction-price strong { color:var(--monet-blue,#5689a8); font-size:22px; }
+#secondhandApp .secondhand-auction-price small { grid-column:2; color:var(--ink-subtle,#91979b); font-size:10px; }
+#secondhandApp .secondhand-auction-stream { flex:1; min-height:0; overflow-y:auto; }
+#secondhandApp .secondhand-bid-stream { display:flex; flex-direction:column; gap:7px; margin:0 14px 14px; }
+#secondhandApp .secondhand-bid-line { display:flex; align-items:flex-start; gap:8px; padding:8px 10px; border-radius:6px; background:var(--surface-card,#fff); color:var(--ink-light,#686f73); font-size:12px; line-height:1.45; }
+#secondhandApp .secondhand-bid-line strong { flex:none; color:var(--monet-deepwater,#446e89); }
+#secondhandApp .secondhand-auction-controls { display:flex; gap:8px; padding:10px 14px; background:var(--surface-card,#fff); border-top:1px solid var(--border-separator,#e5e1db); }
+#secondhandApp .secondhand-auction-controls input { flex:1.4; min-width:0; min-height:38px; box-sizing:border-box; padding:8px 9px; border:1px solid var(--border-light,#d9d5cf); border-radius:5px; background:var(--surface-input,#f1f2f0); color:var(--ink,#2f3437); font:inherit; font-size:12px; }
+#secondhandApp .secondhand-auction-controls button { flex:1; min-height:38px; }
+#secondhandApp .secondhand-auction-controls button.primary { border-color:var(--monet-blue,#5689a8); background:var(--monet-blue,#5689a8); color:#fff; }
+#secondhandApp .secondhand-auction-chat-controls { display:flex; gap:8px; padding:0 14px calc(12px + var(--sab,0px)); background:var(--surface-card,#fff); }
+#secondhandApp .secondhand-auction-chat-controls input { flex:1; min-width:0; box-sizing:border-box; padding:9px 10px; border:1px solid var(--border-light,#d9d5cf); border-radius:5px; background:var(--surface-input,#f1f2f0); color:var(--ink,#2f3437); font:inherit; font-size:12px; }
+#secondhandApp .secondhand-auction-chat-controls button { flex:none; padding:8px 13px; border:1px solid var(--border-light,#d9d5cf); border-radius:5px; background:var(--surface-card,#fff); color:var(--monet-blue,#5689a8); font-size:12px; cursor:pointer; }
+#secondhandApp .secondhand-auction-note { margin-top:9px; color:var(--ink-subtle,#91979b); font-size:10px; line-height:1.5; }
+#secondhandApp .secondhand-auction-result { margin:14px; padding:14px; border:1px solid var(--border-light,#e6e2dc); border-radius:8px; background:var(--surface-card,#fff); color:var(--ink-light,#686f73); text-align:center; font-size:13px; }

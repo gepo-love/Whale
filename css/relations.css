@@ -1,0 +1,193 @@
+/* ═══════ 关系网 App — 米白磨砂 ═══════ */
+#relationsApp {
+  --rel-bg: #F7F6F3;
+  --rel-card: #FFFFFF;
+  --rel-accent: #8FAFBF;
+  --rel-ink: #2C3E50;
+  --rel-ink-light: #7B8FA0;
+  --rel-ink-subtle: #A0B4C4;
+  --rel-divider: #EBE8E2;
+  --rel-npc-badge: #C0A080;
+  --rel-char-badge: #7BA4C5;
+  --rel-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  --rel-radius: 12px;
+  background: var(--rel-bg);
+  min-height: 100%;
+}
+
+/* ═══════ 工具栏 ═══════ */
+.rel-toolbar {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 0.5px solid var(--rel-divider);
+  flex-wrap: wrap;
+}
+.rel-char-select {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 12px;
+  border: 1px solid var(--rel-divider);
+  border-radius: 10px;
+  font-size: 14px;
+  background: var(--rel-card);
+  color: var(--rel-ink);
+  outline: none;
+  font-family: inherit;
+  appearance: auto;
+}
+.rel-toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+.rel-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.rel-btn:active { opacity: 0.7; }
+.rel-btn-ai {
+  background: var(--rel-accent);
+  color: #fff;
+}
+.rel-btn-add {
+  background: var(--rel-card);
+  color: var(--rel-accent);
+  border: 1px solid var(--rel-accent);
+}
+
+/* ═══════ 关系列表 ═══════ */
+.rel-list {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rel-empty-hint {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--rel-ink-subtle);
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════ 关系卡片 ═══════ */
+.rel-card {
+  background: var(--rel-card);
+  border-radius: var(--rel-radius);
+  padding: 14px 16px;
+  box-shadow: var(--rel-shadow);
+  border: 0.5px solid var(--rel-divider);
+}
+.rel-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.rel-card-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--rel-ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rel-card-kind {
+  font-size: 12px;
+  color: var(--rel-accent);
+  background: #EDF3F7;
+  padding: 2px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.rel-card-note {
+  font-size: 13px;
+  color: var(--rel-ink-light);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.rel-card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.rel-card-btn {
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rel-divider);
+  background: transparent;
+  color: var(--rel-ink-light);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.rel-card-btn:active { background: #f0f0f0; }
+.rel-card-btn-del {
+  color: #c97a8a;
+  border-color: #e8d0d0;
+}
+
+/* ═══════ 徽章 ═══════ */
+.rel-badge-npc {
+  font-size: 10px;
+  background: #F0EBE3;
+  color: var(--rel-npc-badge);
+  padding: 1px 7px;
+  border-radius: 8px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+.rel-badge-char {
+  font-size: 10px;
+  background: #E3EDF5;
+  color: var(--rel-char-badge);
+  padding: 1px 7px;
+  border-radius: 8px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════ 编辑表单（Modal 内） ═══════ */
+.rel-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 280px;
+}
+.rel-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rel-form-row label {
+  font-size: 12px;
+  color: var(--rel-ink-subtle);
+  letter-spacing: 0.5px;
+}
+.rel-form-row input,
+.rel-form-row textarea,
+.rel-form-row select {
+  padding: 10px 12px;
+  border: 1px solid var(--rel-divider);
+  border-radius: 10px;
+  font-size: 14px;
+  background: #F9F8F6;
+  color: var(--rel-ink);
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+.rel-form-row input:focus,
+.rel-form-row textarea:focus,
+.rel-form-row select:focus {
+  border-color: var(--rel-accent);
+  background: #fff;
+}

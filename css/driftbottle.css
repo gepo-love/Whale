@@ -1,0 +1,615 @@
+/**
+ * 漂流瓶 — 瓶子动画 + 纸条 + 留言板
+ */
+
+/* ═══════ 页面容器 ═══════ */
+
+#driftBottleApp .db-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(180deg, #E8F4F8 0%, #B8D8E8 40%, #7AB8D4 100%);
+}
+
+/* ═══════ 模式切换 ═══════ */
+
+#driftBottleApp .db-mode-tabs {
+  display: flex;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 0.5px solid rgba(0,0,0,0.06);
+}
+#driftBottleApp .db-mode-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: #7A9BAE;
+  cursor: pointer;
+  letter-spacing: 1px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+}
+#driftBottleApp .db-mode-tab.active {
+  color: #2E5F75;
+  border-bottom-color: #2E5F75;
+  font-weight: 600;
+}
+
+/* ═══════ 扔瓶子模式 ═══════ */
+
+#driftBottleApp .db-throw-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#driftBottleApp .db-bottle-anim {
+  width: 80px; height: 120px;
+  position: relative;
+  cursor: pointer;
+  animation: dbFloat 3s ease-in-out infinite;
+}
+@keyframes dbFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+#driftBottleApp .db-bottle-anim.throwing {
+  animation: dbThrow 0.8s ease-out forwards;
+}
+@keyframes dbThrow {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  50% { transform: translateY(-80px) translateX(60px) rotate(15deg); opacity: 0.7; }
+  100% { transform: translateY(-200px) translateX(200px) rotate(30deg); opacity: 0; }
+}
+#driftBottleApp .db-throw-hint {
+  font-size: 13px;
+  color: #6A9AB5;
+  font-weight: 300;
+  letter-spacing: 1px;
+  margin-top: 12px;
+  text-align: center;
+}
+#driftBottleApp .db-thrown-list {
+  padding: 12px;
+}
+#driftBottleApp .db-thrown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #5A8A9E;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+}
+
+/* ═══════ 捞瓶子模式 ═══════ */
+
+#driftBottleApp .db-pick-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 0 20px;
+}
+#driftBottleApp .db-bottle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 6px 12px;
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 2px 8px rgba(58,107,130,0.08);
+  transition: transform 0.15s;
+}
+#driftBottleApp .db-bottle-row:active {
+  transform: scale(0.97);
+}
+#driftBottleApp .db-bottle-mini {
+  width: 36px; height: 54px;
+  flex-shrink: 0;
+  position: relative;
+  animation: dbFloat 2.5s ease-in-out infinite;
+}
+#driftBottleApp .db-bottle-mini:nth-child(1) { animation-delay: 0s; }
+#driftBottleApp .db-bottle-info {
+  flex: 1; min-width: 0;
+}
+#driftBottleApp .db-bottle-preview {
+  font-size: 13px;
+  color: #3D6B82;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#driftBottleApp .db-bottle-from {
+  font-size: 10px;
+  color: #8AB0C0;
+  margin-top: 3px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+#driftBottleApp .db-bottle-time {
+  font-size: 10px;
+  color: #AAC8D4;
+  flex-shrink: 0;
+}
+
+/* ═══════ 瓶子详情弹层 ═══════ */
+
+#driftBottleApp .db-detail-overlay,
+.db-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: dbFadeIn 0.25s ease;
+}
+@keyframes dbFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+#driftBottleApp .db-detail-card,
+.db-detail-card {
+  width: 88%;
+  max-width: 340px;
+  max-height: 78vh;
+  background: #FAF5E8;
+  border-radius: 12px;
+  overflow-y: auto;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+  position: relative;
+  animation: dbBottleOpen 0.5s ease;
+}
+@keyframes dbBottleOpen {
+  0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+  60% { transform: scale(1.05) rotate(1deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+#driftBottleApp .db-detail-close,
+.db-detail-close {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.06);
+  color: #888;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+#driftBottleApp .db-paper,
+.db-paper {
+  padding: 24px 20px 16px;
+  font-family: KaiTi, STKaiti, serif;
+  color: #4A3728;
+  font-size: 14px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: break-word; word-break: normal;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(139,115,85,0.08), transparent 26px),
+    radial-gradient(circle at 82% 68%, rgba(200,160,96,0.10), transparent 34px),
+    linear-gradient(135deg, rgba(255,249,232,0.96), rgba(239,224,194,0.92));
+  min-height: 120px;
+}
+#driftBottleApp .db-paper-from,
+.db-paper-from {
+  text-align: right;
+  font-size: 11px;
+  color: #8B7355;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* ═══════ 发送者信息弹窗 ═══════ */
+
+#driftBottleApp .db-sender-popup,
+.db-sender-popup {
+  margin: 0 16px 12px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #E8DCC8;
+  font-size: 12px;
+  color: #6B5B3E;
+  line-height: 1.6;
+}
+#driftBottleApp .db-sender-name,
+.db-sender-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #3A6B82;
+}
+#driftBottleApp .db-sender-rel,
+.db-sender-rel {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+#driftBottleApp .db-sender-rel.friend, .db-sender-rel.friend { background: #E8F5E0; color: #5A8A4A; }
+#driftBottleApp .db-sender-rel.mayknow, .db-sender-rel.mayknow { background: #FFF3E0; color: #C88A3A; }
+#driftBottleApp .db-sender-rel.stranger, .db-sender-rel.stranger { background: #F0F0F0; color: #999; }
+
+/* ═══════ 留言板 ═══════ */
+
+#driftBottleApp .db-reply-section,
+.db-reply-section {
+  border-top: 1px solid #E8DCC8;
+  padding: 12px 16px;
+  background: #FFF9F0;
+}
+#driftBottleApp .db-reply-title,
+.db-reply-title {
+  font-size: 11px;
+  color: #A89880;
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+#driftBottleApp .db-reply-item,
+.db-reply-item {
+  padding: 8px 0;
+  border-bottom: 0.5px solid #F0E8D8;
+  font-size: 12px;
+  color: #6B5B3E;
+  line-height: 1.6;
+}
+#driftBottleApp .db-reply-sender,
+.db-reply-sender {
+  font-size: 10px;
+  color: #A89880;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+#driftBottleApp .db-reply-input-row,
+.db-reply-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-bottom: var(--sab, env(safe-area-inset-bottom, 0px));
+}
+#driftBottleApp .db-reply-input,
+.db-reply-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #E0D8C8;
+  border-radius: 10px;
+  font-size: 12px;
+  background: #fff;
+  color: #5A4A3A;
+  font-family: inherit;
+  outline: none;
+}
+#driftBottleApp .db-reply-input:focus,
+.db-reply-input:focus {
+  border-color: #8AB0C0;
+}
+#driftBottleApp .db-reply-send,
+.db-reply-send {
+  padding: 8px 14px;
+  background: #7AB8D4;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+  white-space: nowrap;
+}
+#driftBottleApp .db-reply-send:active {
+  background: #5A9AB5;
+}
+
+/* ═══════ 角色选择下拉 ═══════ */
+
+#driftBottleApp .db-char-select {
+  position: relative;
+  display: inline-block;
+}
+#driftBottleApp .db-char-dropdown {
+  position: absolute;
+  top: 100%; right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  min-width: 160px;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+}
+#driftBottleApp .db-char-dropdown.show {
+  display: block;
+}
+#driftBottleApp .db-char-option {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #3D6B82;
+  cursor: pointer;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  border-bottom: 0.5px solid #F0F0F0;
+  white-space: nowrap;
+}
+#driftBottleApp .db-char-option:active {
+  background: #F5F9FB;
+}
+#driftBottleApp .db-char-option.active {
+  background: #E8F4F8;
+  font-weight: 500;
+}
+#driftBottleApp .db-char-option.all {
+  color: #999;
+  font-style: italic;
+}
+
+/* ═══════ 空状态 ═══════ */
+
+#driftBottleApp .db-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8AB0C0;
+}
+#driftBottleApp .db-empty-icon {
+  font-size: 48px;
+  opacity: 0.5;
+  margin-bottom: 12px;
+}
+#driftBottleApp .db-empty-text {
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+/* ═══════ Loading ═══════ */
+
+#driftBottleApp .db-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 10px;
+  color: #7A9BAE;
+  font-size: 12px;
+}
+#driftBottleApp .db-loading-dots {
+  display: flex;
+  gap: 5px;
+}
+#driftBottleApp .db-loading-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #8AB0C0;
+  animation: dbDotBounce 1.2s infinite ease-in-out;
+}
+#driftBottleApp .db-loading-dot:nth-child(1) { animation-delay: 0s; }
+#driftBottleApp .db-loading-dot:nth-child(2) { animation-delay: 0.16s; }
+#driftBottleApp .db-loading-dot:nth-child(3) { animation-delay: 0.32s; }
+@keyframes dbDotBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+  40% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ═══════ 扔瓶子：写作区 ═══════ */
+
+#driftBottleApp .db-throw-write-card {
+  width: 100%;
+  max-width: 320px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  border: 0.5px solid rgba(255,255,255,0.2);
+}
+#driftBottleApp .db-throw-textarea {
+  width: 100%;
+  min-height: 100px;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #3A5A6A;
+  resize: vertical;
+  font-family: KaiTi, STKaiti, serif;
+  letter-spacing: 0.5px;
+  outline: none;
+  box-sizing: border-box;
+}
+#driftBottleApp .db-throw-textarea::placeholder {
+  color: #B0C8D4;
+  font-style: italic;
+}
+#driftBottleApp .db-throw-cancel {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 20px;
+  border: 0.5px solid rgba(255,255,255,0.3);
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 1px;
+  text-align: center;
+}
+#driftBottleApp .db-throw-confirm {
+  flex: 2;
+  padding: 8px 0;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(135deg, #5A9AB5, #3A7A95);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+#driftBottleApp .db-throw-confirm:active {
+  opacity: 0.8;
+}
+
+/* 已扔瓶子列表 */
+#driftBottleApp .db-thrown-title {
+  font-size: 12px;
+  color: #8AB0C0;
+  padding: 6px 0 10px;
+  text-align: center;
+  letter-spacing: 1.5px;
+}
+#driftBottleApp .db-thrown-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+#driftBottleApp .db-thrown-content {
+  flex: 1;
+  min-width: 0;
+}
+#driftBottleApp .db-thrown-text {
+  font-size: 12px;
+  color: #6A8A9A;
+  line-height: 1.4;
+}
+#driftBottleApp .db-thrown-reply-preview {
+  font-size: 11px;
+  color: #D498A8;
+  margin-top: 3px;
+  letter-spacing: 0.5px;
+}
+#driftBottleApp .db-thrown-time {
+  font-size: 10px;
+  color: #AAC8D4;
+  flex-shrink: 0;
+}
+#driftBottleApp .db-thrown-item.has-reply {
+  border-left: 2px solid rgba(212,152,168,0.4);
+}
+
+/* 浮动瓶子动画 */
+#driftBottleApp .db-bottle-anim.floating {
+  animation: dbFloatSlow 4s ease-in-out infinite;
+}
+@keyframes dbFloatSlow {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  25% { transform: translateY(-6px) rotate(1deg); }
+  50% { transform: translateY(-3px) rotate(-0.5deg); }
+  75% { transform: translateY(-8px) rotate(0.5deg); }
+}
+
+/* ═══════ 回信弹窗动画 ═══════ */
+
+.db-reply-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: dbFadeIn 0.3s ease;
+}
+@keyframes dbFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.db-reply-card {
+  background: linear-gradient(180deg, #F8F4EC, #F0E8D8);
+  border-radius: 18px;
+  padding: 24px 22px 20px;
+  width: 300px;
+  max-width: 90vw;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  animation: dbReplyPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+@keyframes dbReplyPop {
+  from { transform: scale(0.5) translateY(30px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+.db-reply-float {
+  font-size: 40px;
+  animation: dbFloatIn 0.6s ease-out;
+}
+@keyframes dbFloatIn {
+  from { transform: translateY(-40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.db-reply-title {
+  font-size: 17px;
+  font-weight: 500;
+  color: #5A7A8A;
+  letter-spacing: 2px;
+  margin-top: 8px;
+}
+.db-reply-from {
+  font-size: 13px;
+  color: #A09080;
+  margin: 4px 0 12px;
+  letter-spacing: 1px;
+}
+.db-reply-text {
+  font-size: 14px;
+  color: #4A5A6A;
+  line-height: 1.8;
+  letter-spacing: 0.5px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  text-align: left;
+  margin-bottom: 14px;
+  font-family: KaiTi, STKaiti, serif;
+}
+.db-reply-close-btn {
+  padding: 8px 32px;
+  border-radius: 20px;
+  border: none;
+  background: #8AB8C8;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 2px;
+}

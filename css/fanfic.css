@@ -1,0 +1,1032 @@
+/* ═══════ 同人 App — 清冷蓝调 ═══════ */
+#fanficApp {
+  --ff-bg: #F4F7FA;
+  --ff-card: #FFFFFF;
+  --ff-accent: #7BA4C5;
+  --ff-accent-deep: #5A8AAD;
+  --ff-ink: #2C3E50;
+  --ff-ink-light: #7B8FA0;
+  --ff-ink-subtle: #A0B4C4;
+  --ff-tag-bg: #EBF1F6;
+  --ff-tag-active: #D0E0EE;
+  --ff-divider: #E5ECF3;
+  --ff-heart: #C0D0E0;
+  --ff-heart-active: #E8748A;
+  --ff-warn: #E8A87C;
+  --ff-shadow: 0 2px 12px rgba(120,150,175,0.08);
+  --ff-radius: 14px;
+  background: var(--ff-bg);
+  /* iOS 安全区防护：确保导航栏/返回按钮不被刘海/home indicator 遮挡 */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: var(--sab, env(safe-area-inset-bottom, 0px));
+}
+
+/* ═══════ 顶部导航 ═══════ */
+#fanficApp .ff-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 16px;
+  background: var(--ff-card);
+  border-bottom: 0.5px solid var(--ff-divider);
+  position: relative;
+  flex-shrink: 0;
+}
+#fanficApp .ff-nav-tabs {
+  display: flex;
+  gap: 0;
+}
+#fanficApp .ff-nav-tab {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ff-ink-light);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  user-select: none;
+}
+#fanficApp .ff-nav-tab.active {
+  color: var(--ff-ink);
+  border-bottom-color: var(--ff-accent);
+}
+#fanficApp .ff-nav-avatar {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ff-divider);
+  cursor: pointer;
+  border: 1.5px solid var(--ff-accent);
+  transition: transform 0.15s;
+}
+#fanficApp .ff-nav-avatar:active { transform: translateY(-50%) scale(0.92); }
+#fanficApp .ff-nav-back {
+  position: absolute;
+  left: 12px;                     /* ★ 和其他 App 左上角返回键位置一致 */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;                    /* ★ 热区 36px → 44px */
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 18px;
+  color: var(--ff-ink);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ═══════ 内容区 ═══════ */
+#fanficApp .ff-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+
+/* ═══════ 标签云 ═══════ */
+#fanficApp .ff-tag-cloud {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 12px 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#fanficApp .ff-tag-cloud::-webkit-scrollbar { display: none; }
+#fanficApp .ff-tag-chip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--ff-ink-light);
+  background: var(--ff-tag-bg);
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+}
+#fanficApp .ff-tag-chip.active {
+  background: var(--ff-accent);
+  color: #fff;
+}
+#fanficApp .ff-tag-chip:active { background: var(--ff-tag-active); }
+
+/* ═══════ 子Tab ═══════ */
+#fanficApp .ff-subtabs {
+  display: flex;
+  gap: 0;
+  padding: 0 16px 8px;
+}
+#fanficApp .ff-subtab {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--ff-ink-light);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+  user-select: none;
+}
+#fanficApp .ff-subtab.active {
+  background: var(--ff-accent);
+  color: #fff;
+  font-weight: 500;
+}
+
+/* ═══════ 瀑布流 ═══════ */
+#fanficApp .ff-waterfall {
+  columns: 2;
+  column-gap: 10px;
+  padding: 0 12px;
+}
+#fanficApp .ff-card {
+  break-inside: avoid;
+  margin-bottom: 10px;
+  background: var(--ff-card);
+  border-radius: var(--ff-radius);
+  overflow: hidden;
+  box-shadow: var(--ff-shadow);
+  cursor: pointer;
+  transition: transform 0.12s;
+  border: 0.5px solid var(--ff-divider);
+}
+#fanficApp .ff-card:active { transform: scale(0.97); }
+
+/* ─── 画卡片图片区 ─── */
+#fanficApp .ff-card-img {
+  min-height: 120px;
+  max-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ff-ink);
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+#fanficApp .ff-card-img.art {
+  background: linear-gradient(135deg, #E8F0F6 0%, #DCE8F2 30%, #E0ECF5 60%, #D4E4F0 100%);
+  font-style: italic;
+  letter-spacing: 0.3px;
+}
+#fanficApp .ff-card-img.art::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 0.5px solid rgba(120,150,175,0.15);
+  border-radius: 4px;
+  pointer-events: none;
+}
+#fanficApp .ff-card-img.story {
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 8px;
+  padding: 16px;
+  background: linear-gradient(180deg, #F8FAFC 0%, #F0F4F8 100%);
+  min-height: 140px;
+}
+#fanficApp .ff-card-story-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ff-ink);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+#fanficApp .ff-card-story-warnings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+#fanficApp .ff-card-story-warn-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #FDF0ED;
+  color: var(--ff-warn);
+  font-weight: 500;
+}
+#fanficApp .ff-card-story-preview {
+  font-size: 12px;
+  color: var(--ff-ink-light);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+#fanficApp .ff-card-img.misc {
+  background: linear-gradient(135deg, #F0F4F8 0%, #E8EEF4 100%);
+  font-size: 12px;
+  color: var(--ff-ink-light);
+  min-height: 100px;
+}
+
+/* ─── 卡片底部信息 ─── */
+#fanficApp .ff-card-chars {
+  font-size: 10px;
+  color: var(--ff-accent);
+  padding: 4px 12px 0;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#fanficApp .ff-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 0.5px solid var(--ff-divider);
+}
+#fanficApp .ff-card-author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#fanficApp .ff-card-author-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ff-divider);
+  flex-shrink: 0;
+}
+#fanficApp .ff-card-author-name {
+  font-size: 11px;
+  color: var(--ff-ink-light);
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#fanficApp .ff-card-likes {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--ff-ink-subtle);
+}
+#fanficApp .ff-card-likes svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--ff-heart);
+  fill: none;
+  stroke-width: 1.5;
+}
+#fanficApp .ff-card-likes.liked svg {
+  fill: var(--ff-heart-active);
+  stroke: var(--ff-heart-active);
+}
+
+/* ═══════ 刷新按钮 ═══════ */
+#fanficApp .ff-refresh-row {
+  position: fixed;
+  bottom: 24px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 50;
+  align-items: center;
+}
+#fanficApp .ff-clear-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  color: #999;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+#fanficApp .ff-clear-btn:hover {
+  color: #e74c3c;
+  border-color: #e74c3c;
+  background: #fff;
+}
+#fanficApp .ff-refresh-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--ff-accent);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 16px rgba(123,164,197,0.35);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+#fanficApp .ff-refresh-btn:active { transform: scale(0.9); }
+#fanficApp .ff-refresh-btn.loading {
+  animation: ff-spin 1s linear infinite;
+  pointer-events: none;
+}
+@keyframes ff-spin { to { transform: rotate(360deg); } }
+
+/* ═══════ 广场 ═══════ */
+#fanficApp .ff-plaza-feed {
+  padding: 0;
+}
+#fanficApp .ff-plaza-post {
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--ff-divider);
+  background: var(--ff-card);
+  cursor: pointer;
+}
+#fanficApp .ff-plaza-post:active { background: #F8FAFC; }
+#fanficApp .ff-plaza-post-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+#fanficApp .ff-plaza-post-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ff-divider);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--ff-ink-light);
+  font-weight: 500;
+}
+#fanficApp .ff-plaza-post-user {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ff-ink);
+}
+#fanficApp .ff-plaza-post-time {
+  font-size: 11px;
+  color: var(--ff-ink-subtle);
+  margin-left: auto;
+}
+#fanficApp .ff-plaza-post-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ff-ink);
+  margin-bottom: 8px;
+}
+#fanficApp .ff-plaza-post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+#fanficApp .ff-plaza-post-tag {
+  font-size: 11px;
+  color: var(--ff-accent-deep);
+  background: var(--ff-tag-bg);
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+#fanficApp .ff-plaza-post-actions {
+  display: flex;
+  gap: 20px;
+}
+#fanficApp .ff-plaza-post-act {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ff-ink-subtle);
+  cursor: pointer;
+}
+#fanficApp .ff-plaza-post-act svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+/* ═══════ 作品详情 ═══════ */
+#fanficApp .ff-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--ff-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* 二级浮层覆盖整个视口，必须主动避开原生状态栏和刘海。 */
+  padding-top: max(30px, env(safe-area-inset-top, 0px));
+}
+#fanficApp .ff-detail-header {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  padding: 0 8px;
+  height: 48px;
+  border-bottom: 0.5px solid var(--ff-divider);
+  flex-shrink: 0;
+  position: relative;
+}
+#fanficApp .ff-detail-back {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ff-tag-bg);
+  color: var(--ff-ink);
+  cursor: pointer;
+}
+#fanficApp .ff-detail-back svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#fanficApp .ff-detail-back:active { background: var(--ff-tag-active); }
+#fanficApp .ff-detail-header-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--ff-ink-light);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+#fanficApp .ff-detail-header-spacer { width: 44px; height: 1px; }
+#fanficApp .ff-detail-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  padding-bottom: calc(16px + var(--sab, env(safe-area-inset-bottom, 0px)));
+}
+#fanficApp .ff-detail-type-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: var(--ff-tag-bg);
+  color: var(--ff-accent-deep);
+  margin-bottom: 12px;
+}
+#fanficApp .ff-detail-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ff-ink);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+#fanficApp .ff-detail-warnings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+#fanficApp .ff-detail-warn-tag {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: #FDF0ED;
+  color: var(--ff-warn);
+}
+#fanficApp .ff-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+#fanficApp .ff-detail-tag {
+  font-size: 11px;
+  color: var(--ff-accent-deep);
+  background: var(--ff-tag-bg);
+  padding: 3px 10px;
+  border-radius: 10px;
+}
+#fanficApp .ff-detail-content {
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--ff-ink);
+  white-space: pre-wrap;
+  margin-bottom: 24px;
+}
+#fanficApp .ff-detail-content.art-scene {
+  font-style: italic;
+  letter-spacing: 0.4px;
+  background: linear-gradient(135deg, #F8FAFC, #EEF3F7);
+  padding: 20px;
+  border-radius: var(--ff-radius);
+  border: 0.5px solid var(--ff-divider);
+}
+#fanficApp .ff-detail-author-note {
+  padding: 16px;
+  background: #F8FAFC;
+  border-radius: var(--ff-radius);
+  margin-bottom: 20px;
+  border-left: 3px solid var(--ff-accent);
+}
+#fanficApp .ff-detail-author-note-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ff-ink-light);
+  margin-bottom: 6px;
+}
+#fanficApp .ff-detail-author-note-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ff-ink-light);
+}
+#fanficApp .ff-detail-actions {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 0;
+  border-top: 0.5px solid var(--ff-divider);
+  border-bottom: 0.5px solid var(--ff-divider);
+  margin-bottom: 20px;
+}
+#fanficApp .ff-detail-act {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--ff-ink-light);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+#fanficApp .ff-detail-act:active { background: var(--ff-tag-bg); }
+#fanficApp .ff-detail-act.liked { color: var(--ff-heart-active); }
+#fanficApp .ff-detail-act svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+}
+#fanficApp .ff-detail-act.liked svg { fill: currentColor; }
+
+/* ─── 评论区 ─── */
+#fanficApp .ff-comments-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ff-ink);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#fanficApp .ff-comments-refresh {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ff-accent, #8fafbf);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--ff-accent, #8fafbf);
+  user-select: none;
+  transition: all 0.2s;
+}
+#fanficApp .ff-comments-refresh:hover {
+  background: var(--ff-accent, #8fafbf);
+  color: #fff;
+}
+#fanficApp .ff-comments-refresh:active {
+  opacity: 0.7;
+}
+#fanficApp .ff-comment {
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--ff-divider);
+}
+#fanficApp .ff-comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+#fanficApp .ff-comment-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ff-divider);
+  flex-shrink: 0;
+}
+#fanficApp .ff-comment-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ff-ink);
+}
+#fanficApp .ff-comment-time {
+  font-size: 10px;
+  color: var(--ff-ink-subtle);
+  margin-left: auto;
+}
+#fanficApp .ff-comment-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ff-ink);
+  margin-left: 32px;
+}
+/* ★ 评论操作行（推特风：点赞/回复/删除）+ 引用块 + 回复目标 chip（2026-08-23） */
+#fanficApp .ff-comment-actions {
+  display: flex; gap: 6px;
+  margin: 6px 0 0 32px;
+}
+#fanficApp .ff-comment-act {
+  display: flex; align-items: center; gap: 4px;
+  border: none; background: none;
+  color: var(--ff-ink-subtle);
+  font-size: 11px; cursor: pointer;
+  padding: 3px 8px; border-radius: 12px;
+  transition: color 0.15s, background 0.15s;
+}
+#fanficApp .ff-comment-act svg { stroke: currentColor; }
+#fanficApp .ff-comment-act:hover { color: var(--ff-accent); background: rgba(0,0,0,0.04); }
+#fanficApp .ff-comment-act:active { background: rgba(0,0,0,0.08); }
+#fanficApp .ff-comment-act.liked { color: #f91880; }
+#fanficApp .ff-comment-act.liked svg { fill: #f91880; stroke: #f91880; }
+#fanficApp .ff-comment-act.liked:hover { color: #f91880; }
+#fanficApp .ff-comment-del-act:hover { color: #e74c3c !important; }
+#fanficApp .ff-comment-replyto {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--ff-ink-subtle);
+  background: rgba(0,0,0,0.04);
+  border-radius: 8px;
+  padding: 3px 8px;
+  margin: 2px 0 6px 32px;
+  max-width: 90%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#fanficApp .ff-comment-replyto b { color: var(--ff-accent); font-weight: 600; }
+#fanficApp .ff-reply-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 10px;
+  margin-bottom: 4px;
+  background: rgba(0,0,0,0.04);
+  border: 0.5px solid var(--ff-divider);
+  border-radius: 14px;
+  font-size: 12px;
+  color: var(--ff-ink);
+  width: fit-content;
+}
+#fanficApp .ff-reply-chip-text b { color: var(--ff-accent); }
+#fanficApp .ff-reply-chip-cancel {
+  border: none; background: transparent;
+  color: var(--ff-ink-subtle);
+  font-size: 12px; cursor: pointer; padding: 0 2px;
+}
+#fanficApp .ff-comment-input-wrap {
+  display: flex;
+  gap: 8px;
+  padding: 12px 0;
+  align-items: center;
+}
+#fanficApp .ff-comment-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 0.5px solid var(--ff-divider);
+  border-radius: 20px;
+  font-size: 13px;
+  outline: none;
+  background: #F8FAFC;
+  color: var(--ff-ink);
+  font-family: inherit;
+}
+#fanficApp .ff-comment-input:focus { border-color: var(--ff-accent); }
+#fanficApp .ff-comment-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ff-accent);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ═══════ 设置页 ═══════ */
+#fanficApp .ff-settings {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: none;
+}
+#fanficApp .ff-settings.show { display: block; }
+#fanficApp .ff-settings-card {
+  background: var(--ff-card);
+  border-radius: var(--ff-radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--ff-shadow);
+  border: 0.5px solid var(--ff-divider);
+}
+#fanficApp .ff-settings-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ff-ink);
+  margin-bottom: 12px;
+}
+#fanficApp .ff-character-source-btn {
+  width: 100%;
+  min-height: 42px;
+  margin-bottom: 12px;
+  padding: 9px 12px;
+  border: 1px solid var(--ff-accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--ff-tag-bg);
+  color: var(--ff-accent-deep);
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+#fanficApp .ff-character-source-btn svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#fanficApp .ff-character-source-btn:active { background: var(--ff-tag-active); }
+#fanficApp .ff-manual-character-label { margin-top: 2px; }
+#fanficApp .ff-settings-label {
+  font-size: 12px;
+  color: var(--ff-ink-light);
+  margin-bottom: 6px;
+}
+#fanficApp .ff-settings-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 0.5px solid var(--ff-divider);
+  border-radius: 10px;
+  font-size: 13px;
+  outline: none;
+  background: #F8FAFC;
+  color: var(--ff-ink);
+  font-family: inherit;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+#fanficApp .ff-settings-input:focus { border-color: var(--ff-accent); }
+#fanficApp .ff-settings-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 14px;
+  border: 0.5px solid var(--ff-divider);
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  outline: none;
+  background: #F8FAFC;
+  color: var(--ff-ink);
+  font-family: inherit;
+  box-sizing: border-box;
+  resize: vertical;
+  margin-bottom: 12px;
+}
+#fanficApp .ff-settings-textarea:focus { border-color: var(--ff-accent); }
+#fanficApp .ff-settings-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+#fanficApp .ff-settings-btn.primary {
+  background: var(--ff-accent);
+  color: #fff;
+}
+#fanficApp .ff-settings-btn.primary:active { background: var(--ff-accent-deep); }
+#fanficApp .ff-settings-btn.secondary {
+  background: var(--ff-tag-bg);
+  color: var(--ff-ink);
+  margin-bottom: 8px;
+}
+#fanficApp .ff-settings-btn.danger {
+  background: transparent;
+  color: #E8748A;
+  font-size: 12px;
+}
+
+/* ─── 角色标签列表 ─── */
+#fanficApp .ff-char-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+#fanficApp .ff-char-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--ff-tag-bg);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--ff-ink);
+}
+#fanficApp .ff-char-tag-remove {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ff-ink-subtle);
+  color: #fff;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+#fanficApp .ff-char-tag-remove:active { background: #E8748A; }
+
+/* 人物来源多选器位于全局模态框中，因此不使用 #fanficApp 作用域。 */
+.ff-source-picker {
+  max-height: 52vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ff-source-picker-title {
+  padding: 8px 4px 4px;
+  color: var(--ink-light);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.ff-source-picker-row {
+  min-height: 52px;
+  padding: 8px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface-card);
+  cursor: pointer;
+}
+.ff-source-picker-row.is-added { opacity: 0.62; cursor: default; }
+.ff-source-picker-check { flex: 0 0 auto; accent-color: var(--monet-blue); }
+.ff-source-picker-avatar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-input);
+  color: var(--ink-light);
+  font-size: 13px;
+}
+.ff-source-picker-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.ff-source-picker-name { color: var(--ink); font-size: 13px; font-weight: 500; }
+.ff-source-picker-desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-subtle);
+  font-size: 11px;
+}
+.ff-source-picker-state { flex: 0 0 auto; color: var(--ink-subtle); font-size: 10px; }
+
+/* ─── 收藏列表 ─── */
+#fanficApp .ff-collection-group {
+  margin-bottom: 16px;
+}
+#fanficApp .ff-collection-group-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ff-ink-light);
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+#fanficApp .ff-collection-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #F8FAFC;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#fanficApp .ff-collection-item:active { background: var(--ff-tag-bg); }
+#fanficApp .ff-collection-item-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ff-ink);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+#fanficApp .ff-collection-item-meta {
+  font-size: 11px;
+  color: var(--ff-ink-subtle);
+  flex-shrink: 0;
+}
+
+/* ═══════ 加载状态 ═══════ */
+#fanficApp .ff-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  gap: 6px;
+}
+#fanficApp .ff-loading-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ff-accent);
+  animation: ff-dot 1.4s infinite ease-in-out both;
+}
+#fanficApp .ff-loading-dot:nth-child(1) { animation-delay: -0.32s; }
+#fanficApp .ff-loading-dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes ff-dot {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* ═══════ 空状态 ═══════ */
+#fanficApp .ff-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ff-ink-subtle);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ═══════ 删除按钮 ═══════ */
+#fanficApp .ff-plaza-post-del {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+#fanficApp .ff-plaza-post-del:hover { color: #e74c3c; }
+#fanficApp .ff-comment-del {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+#fanficApp .ff-comment-del:hover { color: #e74c3c; }
+
+/* ═══════ 响应式 ═══════ */
+@media (min-width: 600px) {
+  #fanficApp .ff-waterfall { columns: 3; }
+}
+@media (min-width: 900px) {
+  #fanficApp .ff-waterfall { columns: 4; }
+}

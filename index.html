@@ -1,0 +1,1458 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+  <title>鲸鱼机</title>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8FAFBF">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-180.png">
+	  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+  <!-- 字体：使用系统字体（Google Fonts / jsdelivr CDN 在国内被墙/极慢，去掉外部依赖避免白屏）-->
+  <link rel="stylesheet" href="css/phone.css?v=20260902-premium-phone-v1">
+  <link rel="stylesheet" href="css/chat.css?v=20260902-premium-chat-v1">
+  <link rel="stylesheet" href="css/emoji.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/settings.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/moments.css?v=20260817-calendar-music-models-intent">
+  <!-- phonecheck.css removed — 角色手机已替代 -->
+  <link rel="stylesheet" href="css/driftbottle.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/mall.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/secondhand.css?v=20260819-secondhand-v6">
+  <link rel="stylesheet" href="css/theme.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/toolbox.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/games.css?v=20260819-game-v1">
+  <link rel="stylesheet" href="css/watch.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/listentogether.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/pomodoro.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/forum.css?v=20260902-premium-forum-v1">
+  <link rel="stylesheet" href="css/call.css?v=20260721-group-id-fix">
+  <link rel="stylesheet" href="css/home.css?v=20260831-ios-safearea-v2">
+  <link rel="stylesheet" href="css/desktop-cards.css?v=20260902-premium-desktop-v1">
+  <link rel="stylesheet" href="css/calendar.css?v=20260817-calendar-music-models-intent">
+  <link rel="stylesheet" href="css/memoryapp.css?v=20260729-memoryapp">
+  <link rel="stylesheet" href="css/group-cards.css?v=20260730-group-cards">
+  <link rel="stylesheet" href="css/floating-ball.css?v=20260817-calendar-music-models-intent">
+  <link rel="stylesheet" href="css/mcp.css?v=20260802-mcp">
+  <link rel="stylesheet" href="css/fanfic.css?v=20260817-fanfic-picker-back">
+  <link rel="stylesheet" href="css/relations.css?v=20260812-relations">
+  <link rel="stylesheet" href="css/diary.css?v=20260902-diary">
+  <style>
+    /* ═══════ 页面显示控制（内联防缓存，Via 兼容） ═══════ */
+    .page {
+      display:flex !important;            /* 不用 display:none — Via 有 bug */
+      z-index:0;                          /* 垫底 */
+      opacity:0;                          /* 透明 */
+      pointer-events:none;                /* 不可点击 */
+    }
+    .page.active {
+      z-index:10;                         /* 置顶 */
+      opacity:1;                          /* 可见 */
+      pointer-events:auto;                /* 可点击 */
+    }
+    /* ★ iOS 兜底：如果 JS 超时没亮屏，强制显示主页（防黑屏） */
+    @media screen and (max-width: 1024px) {
+      .page:first-of-type { animation: _iosFallback 0.01s 4s forwards; }
+      @keyframes _iosFallback { to { opacity: 1; z-index: 10; pointer-events: auto; } }
+    }
+
+    /* ═══════ 微信容器 ═══════ */
+    .wechat-app { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+    .wechat-content { flex:1; min-height:0; overflow-y:auto; position:relative; }  /* relative 为 chatDetailView 绝对定位提供锚点 */
+    #wechatTabChat { overflow:hidden; }  /* ★ 聊天 tab 用 hidden，确保 chat-detail-inline 的 absolute bottom:0 对准容器可见底部 */
+
+    /* 内联切换 */
+    .chat-detail-inline { display:none; flex-direction:column; position:absolute; top:0; left:0; right:0; bottom:var(--keyboard-height, 0px); min-height:0; overflow:hidden; }  /* ★ 键盘打开时只收缩聊天详情，输入栏固定在可视底部 */
+    .chat-detail-inline.show { display:flex; }
+    .settings-inline { display:none; flex-direction:column; height:100%; min-height:0; overflow-y:auto; }
+    .settings-inline.show { display:flex; }
+
+    html.app-webview-mode {
+      --app-keyboard-offset: 0px;
+    }
+    html.app-webview-mode body {
+      overscroll-behavior: none;
+      touch-action: manipulation;  /* ★ PWA 模式：消除 300ms 延迟 + 阻止浏览器手势干扰 */
+    }
+    html.app-webview-mode .chat-input-area,
+    html.app-webview-mode .lt-input-bar {
+      padding-bottom: calc(8px + var(--sab, env(safe-area-inset-bottom, 0px)));
+    }
+    html.app-webview-mode .modal-content {
+      max-height: calc(var(--app-height, 100vh) - 48px);
+    }
+
+    /* ═══════ 联系人 — 扁平列表 ═══════ */
+    .contact-item {
+      display:flex; align-items:center; gap:12px; padding:12px 16px; cursor:pointer;
+      background:var(--surface-card); margin:0;
+      border-bottom:0.5px solid var(--border-separator);
+    }
+    .contact-item:active { background:var(--surface-page); }
+    .contact-item .avatar {
+      width:52px; height:52px; border-radius:6px; flex-shrink:0;
+      font-size:24px;
+    }
+    .contact-item-info { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; }
+    .contact-item-name {
+      font-size:14px; font-weight:var(--font-wt-medium); letter-spacing:0.5px; color:var(--ink);
+      line-height:1.3;
+    }
+
+    /* ═══════ 朋友圈 ═══════ */
+    .moments-tab-content { height:100%; overflow-y:auto; background:transparent; }
+
+    /* ═══════ 我的 — 扁平菜单 ═══════ */
+    .me-tab-content { background:transparent; }
+    .me-profile-card {
+      display:flex; align-items:center; gap:18px; padding:28px 20px; cursor:pointer;
+      background:var(--surface-card); margin:12px 12px 0; border-radius:16px;
+      box-shadow:0 2px 8px rgba(44,62,80,0.06);
+    }
+    .me-profile-card:active { background:var(--surface-page); }
+    .me-menu-section { margin:0 12px; }
+    .me-menu-title {
+      font-size:11px; color:var(--ink-subtle); font-weight:var(--font-wt-medium); letter-spacing:1.5px;
+      padding:16px 8px 8px; background:transparent;
+    }
+    .me-menu-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 16px;
+      background:var(--surface-card); cursor:pointer;
+      border-radius:16px; margin:0 0 1px;
+      border-bottom:none;
+    }
+    .me-menu-item:active { background:var(--surface-page); }
+    .me-menu-left { display:flex; align-items:center; gap:14px; }
+    .me-menu-icon {
+      width:48px; height:48px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      background:var(--surface-input); border:0.5px solid var(--border-light);
+    }
+    .me-menu-icon svg {
+      width:22px; height:22px; stroke:var(--ink-light);
+      fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round;
+    }
+    .me-menu-label {
+      font-size:14px; color:var(--ink); font-weight:var(--font-wt-medium); letter-spacing:0.5px;
+    }
+    .me-menu-value { font-size:13px; color:var(--ink-subtle); font-weight:var(--font-wt-regular); }
+    .me-version-footer {
+      padding:12px 16px 18px;
+      text-align:center;
+      font-size:11px;
+      color:var(--ink-subtle);
+      opacity:0.8;
+      cursor:pointer;
+    }
+    .me-version-footer:active { opacity:1; }
+
+    /* ═══════ 表单 ═══════ */
+    .form-group { margin:12px 0; }
+    .form-label {
+      display:block; font-size:13px; color:var(--ink-light);
+      margin-bottom:6px; font-weight:300; letter-spacing:1.2px;
+    }
+    .form-input {
+      width:100%; padding:11px 14px;
+      background:var(--surface-input); border:1px solid var(--border-light);
+      border-radius:14px; font-size:15px;
+      font-weight:300; letter-spacing:0.8px; color:var(--ink);
+    }
+    .form-input:focus { border-color:var(--monet-blue); outline:none; }
+    .form-input::placeholder { color:var(--ink-subtle); }
+    textarea.form-input { resize:vertical; min-height:70px; line-height:1.5; }
+    .form-hint { font-size:11px; color:var(--ink-subtle); margin-top:4px; letter-spacing:0.8px; }
+    .form-btn {
+      width:100%; padding:12px; background:var(--monet-blue); color:#fff;
+      border-radius:14px; font-size:15px; font-weight:300; letter-spacing:1.2px;
+      cursor:pointer; text-align:center;
+      box-shadow:0 2px 10px rgba(123,165,184,0.25);
+    }
+    .form-btn:active { background:var(--monet-deepwater); }
+    .form-btn.secondary {
+      background:var(--surface-input); color:var(--ink);
+      border:1px solid var(--border-light); box-shadow:none;
+    }
+
+    /* ═══════ 世界书/记忆卡片 ═══════ */
+    .worldbook-card, .memory-item {
+      padding:16px 18px;
+      background:var(--surface-card); cursor:pointer;
+      margin:0 12px 8px; border-radius:16px;
+      border:1px solid var(--border-light); box-shadow:var(--shadow-card);
+    }
+    .worldbook-card:active, .memory-item:active { background:var(--surface-page); }
+    .worldbook-name {
+      font-size:15px; font-weight:300; letter-spacing:1.2px;
+      margin-bottom:4px; color:var(--ink);
+    }
+    .worldbook-preview {
+      font-size:13px; color:var(--ink-light); font-weight:300;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .memory-content {
+      font-size:14px; line-height:1.5; margin-bottom:4px;
+      color:var(--ink); font-weight:300;
+    }
+    .memory-meta {
+      font-size:11px; color:var(--ink-subtle); font-weight:300; letter-spacing:1px;
+      display:flex; gap:10px;
+    }
+
+    /* ═══════ 多选工具栏 ═══════ */
+    .multi-select-toolbar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px; background:var(--surface-card);
+      border-top:1px solid var(--border-light);
+      position:absolute; bottom:0; left:0; right:0; z-index:20;
+      box-shadow:0 -2px 12px rgba(0,0,0,0.05);
+    }
+    .multi-select-count {
+      font-size:14px; color:var(--ink); font-weight:300; letter-spacing:1px;
+    }
+    .multi-select-actions { display:flex; gap:8px; }
+    .multi-select-btn {
+      padding:8px 16px; border-radius:12px; font-size:14px; font-weight:300;
+      letter-spacing:1px; cursor:pointer; border:none;
+    }
+
+    /* ═══════ 消息多选复选框 ═══════ */
+    .msg-checkbox-wrap {
+      display:flex; align-items:center; padding:0 6px; flex-shrink:0;
+      animation: checkboxIn 0.2s ease;
+    }
+    /* ★ 2026-09-01 系统消息多选行：复选框 + 居中灰字 */
+    .message-system-select-row {
+      display:flex; align-items:center; justify-content:center;
+      gap:4px; padding:3px 0; cursor:pointer;
+    }
+    .message-system-select-row .message-system { flex-shrink:0; }
+    .message-system-select-row.multi-select-active { opacity:0.7; }
+    .message-system-select-row.multi-select-selected { opacity:1; }
+    @keyframes checkboxIn {
+      from { opacity:0; transform:scale(0.5); }
+      to { opacity:1; transform:scale(1); }
+    }
+    .msg-checkbox-circle {
+      width:22px; height:22px; border-radius:50%;
+      border:2px solid var(--border-light); cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:all 0.15s; flex-shrink:0;
+    }
+    .msg-checkbox-circle.checked {
+      background:var(--monet-blue); border-color:var(--monet-blue);
+    }
+    .msg-checkbox-circle.checked::after {
+      content:''; display:block; width:6px; height:10px;
+      border:solid #fff; border-width:0 2px 2px 0;
+      transform:rotate(45deg) translateY(-1px);
+    }
+    .message-row.multi-select-active .message-content {
+      opacity:0.7;
+    }
+    .message-row.multi-select-selected .message-content {
+      opacity:1;
+    }
+    /* SW 更新提示动画 */
+    @keyframes sw-toast-in {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ★ 年龄确认：首次进入需确认 16 岁以上 -->
+  <div id="age-gate-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#f5f0eb;z-index:9999999;display:none;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;padding:24px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">🐋</div>
+    <div style="font-size:17px;font-weight:400;letter-spacing:1px;margin-bottom:24px;color:#333;max-width:280px;line-height:2;">
+      本应用内容适合 16 岁以上用户。<br>点击继续即确认您已年满 16 岁。
+    </div>
+    <button onclick="document.getElementById('age-gate-overlay').style.display='none';localStorage.setItem('littlephone_age_16_confirmed','1');" style="padding:14px 48px;background:#8FAFBF;color:#fff;border:none;border-radius:24px;font-size:16px;letter-spacing:2px;cursor:pointer;font-weight:300;">继 续</button>
+  </div>
+  <script>
+  (function(){if(!localStorage.getItem('littlephone_age_16_confirmed')){document.getElementById('age-gate-overlay').style.display='flex';}})();
+  </script>
+
+  <!-- ★ 加载动画：像素鲸鱼，纯 CSS，不依赖 JS，杜绝白屏 -->
+  <div id="app-loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#f5f0eb;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;">
+    <!-- 像素鲸鱼 CSS 动画 -->
+    <style>
+      @keyframes whale-bob {
+        0%,100% { transform: translateY(0) rotate(0deg); }
+        25% { transform: translateY(-6px) rotate(-1.5deg); }
+        75% { transform: translateY(4px) rotate(1.5deg); }
+      }
+      @keyframes whale-tail {
+        0%,100% { transform: rotate(0deg); }
+        50% { transform: rotate(8deg); }
+      }
+      @keyframes whale-spout {
+        0%,100% { opacity:0.4; transform: translateY(0) scale(1); }
+        50% { opacity:1; transform: translateY(-4px) scale(1.3); }
+      }
+      @keyframes loading-dots {
+        0%,20% { opacity: 0; }
+        50% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+      .pixel-whale {
+        animation: whale-bob 2.4s ease-in-out infinite;
+        transform-origin: center center;
+      }
+      .whale-tail {
+        animation: whale-tail 1.8s ease-in-out infinite;
+        transform-origin: 4px 28px;
+      }
+      .whale-spout-dot {
+        animation: whale-spout 1.2s ease-in-out infinite;
+      }
+      .whale-spout-dot:nth-child(2) { animation-delay: 0.15s; }
+      .whale-spout-dot:nth-child(3) { animation-delay: 0.3s; }
+      .loading-dot { animation: loading-dots 1.4s ease-in-out infinite; }
+      .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+      .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+    <!-- 像素鲸鱼 SVG -->
+    <svg class="pixel-whale" viewBox="0 0 100 60" width="120" height="72" xmlns="http://www.w3.org/2000/svg">
+      <!-- 喷水 -->
+      <rect class="whale-spout-dot" x="38" y="4" width="4" height="7" rx="1.5" fill="#b8d8e8"/>
+      <rect class="whale-spout-dot" x="34" y="7" width="3" height="5" rx="1" fill="#c8e4f0"/>
+      <rect class="whale-spout-dot" x="42" y="6" width="3" height="5" rx="1" fill="#c8e4f0"/>
+      <!-- 尾巴 -->
+      <g class="whale-tail">
+        <rect x="2" y="22" width="10" height="6" rx="2" fill="#6a9ab5"/>
+        <rect x="0" y="18" width="6" height="5" rx="1.5" fill="#5d8da8"/>
+        <rect x="0" y="27" width="6" height="5" rx="1.5" fill="#5d8da8"/>
+      </g>
+      <!-- 身体主体 -->
+      <rect x="12" y="16" width="44" height="18" rx="8" fill="#8FAFBF"/>
+      <rect x="8" y="18" width="10" height="14" rx="5" fill="#7a9fb0"/>
+      <!-- 肚皮 -->
+      <rect x="20" y="28" width="28" height="6" rx="3" fill="#c8e0eb"/>
+      <!-- 眼睛 -->
+      <circle cx="48" cy="22" r="5" fill="#fff"/>
+      <circle cx="49" cy="22" r="2.5" fill="#3a5060"/>
+      <circle cx="50" cy="21" r="1" fill="#fff"/>
+      <!-- 鳍 -->
+      <rect x="24" y="32" width="8" height="4" rx="2" fill="#6a9ab5"/>
+      <!-- 微笑 -->
+      <rect x="40" y="30" width="8" height="2" rx="1" fill="#6a9ab5"/>
+      <rect x="42" y="32" width="2" height="2" rx="1" fill="#6a9ab5"/>
+    </svg>
+    <!-- 加载文字 + 点点点 -->
+    <div style="display:flex;align-items:center;gap:2px;margin-top:16px;">
+      <span id="app-loading-text" style="font-size:13px;color:#999;letter-spacing:1px;font-weight:300;">加载中</span>
+      <span class="loading-dot" style="font-size:13px;color:#999;">.</span>
+      <span class="loading-dot" style="font-size:13px;color:#999;">.</span>
+      <span class="loading-dot" style="font-size:13px;color:#999;">.</span>
+    </div>
+    <div style="width:140px;height:2px;background:#e8e0d8;border-radius:2px;margin-top:14px;overflow:hidden;">
+      <div id="app-loading-bar" style="height:100%;background:linear-gradient(90deg,#8FAFBF,#6b9db3);border-radius:2px;width:0%;transition:width 0.5s ease;"></div>
+    </div>
+    <div id="app-loading-sub" style="font-size:11px;color:#c0b8b0;margin-top:8px;font-weight:300;"></div>
+  </div>
+  <!-- ★ 加载进度遮罩结束 -->
+  <!-- ★ 兜底超时：bundle 解析可能要好几秒，这个脚本在 bundle 之前就跑，确保不会无限白屏 -->
+  <script>
+    (function(){
+      var bar = document.getElementById('app-loading-bar');
+      // 进度条自动蠕动（不依赖 bundle 加载）
+      if (bar) {
+        var w = 0;
+        setInterval(function(){ w = (w + 1) % 60; bar.style.width = Math.min(30, 5 + w * 0.4) + '%'; }, 200);
+      }
+      // 8 秒兜底：超时直接隐藏遮罩（APK WebView 解析 1.8MB JS 可能很慢）
+      setTimeout(function(){
+        var overlay = document.getElementById('app-loading-overlay');
+        if (overlay) { overlay.style.opacity = '0'; overlay.style.transition = 'opacity 0.4s'; }
+        setTimeout(function(){
+          try { overlay && overlay.remove(); } catch(e) {}
+        }, 500);
+      }, 8000);
+    })();
+  </script>
+
+  <!-- ═══════════════ 手机外壳 ═══════════════ -->
+  <div class="phone">
+
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <div class="status-left"><span id="statusBarTime">00:00</span></div>
+      <div class="status-right">
+        <div class="signal-icon">
+          <div class="signal-bar"></div><div class="signal-bar"></div>
+          <div class="signal-bar"></div><div class="signal-bar"></div>
+        </div>
+        <div class="battery-icon">
+          <div class="battery-level" id="batteryLevel"></div>
+          <div class="battery-tip"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen">
+
+      <!-- ═══════════ 🏠 桌面 ═══════════ -->
+      <div id="homeScreen" class="page active">
+        <div class="desktop">
+
+          <!-- ═══ 页面滑动容器 ═══ -->
+          <div class="desktop-swiper" id="desktopSwiper">
+
+            <div class="desktop-page" id="desktopPage1">
+              <div class="desktop-card-grid" id="desktopGrid0"></div>
+            </div>
+
+            <div class="desktop-page" id="desktopPage2">
+              <div class="desktop-card-grid" id="desktopGrid1"></div>
+            </div>
+
+            <div class="desktop-page" id="desktopPage3">
+              <div class="desktop-card-grid" id="desktopGrid2"></div>
+            </div>
+
+            <div class="desktop-page" id="desktopPage4">
+              <div class="desktop-card-grid" id="desktopGrid3"></div>
+            </div>
+
+          </div><!-- /desktop-swiper -->
+
+          <!-- 翻页指示点 -->
+          <div class="desktop-dots" id="desktopDots">
+            <span class="desktop-dot active"></span>
+            <span class="desktop-dot"></span>
+            <span class="desktop-dot"></span>
+            <span class="desktop-dot"></span>
+          </div>
+
+          <!-- Dock -->
+          <div class="dock" id="homeDock">
+            <div class="dock-item" onclick="openWechatApp()">
+              <div class="dock-icon" data-icon="dock_chat"></div>
+              <div class="dock-label">聊天</div>
+            </div>
+            <div class="dock-item" onclick="openApp('recall')">
+              <div class="dock-icon" data-icon="dock_recall"></div>
+              <div class="dock-label">回忆</div>
+            </div>
+            <div class="dock-item" onclick="openSettingsFromHome()">
+              <div class="dock-icon" data-icon="dock_settings"></div>
+              <div class="dock-label">设置</div>
+            </div>
+            <div class="dock-item" onclick="DesktopCards.toggleEdit()">
+              <div class="dock-icon" data-icon="dock_more"></div>
+              <div class="dock-label">装修</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 📱 微信 ═══════════ -->
+      <div id="wechatApp" class="page">
+        <div class="nav-bar" id="wechatNavBar">
+          <button class="nav-btn" id="wechatNavBtn" onclick="goBack()">←</button>
+          <div class="nav-title" id="wechatNavTitle"><span class="nav-title-text">微信</span><span class="nav-subtitle" id="wechatNavSubtitle" style="display:none;"></span></div>
+          <div style="display:flex;align-items:center;gap:2px;" id="wechatNavRight">
+            <span class="nav-status" id="chatNavStatus" style="display:none;font-size:16px;cursor:pointer;" title="AI状态"></span>
+            <button class="nav-action" id="chatSelectBtn" style="display:none;" onclick="enterMultiSelectMode()">选择</button>
+            <button class="nav-action" id="chatMultiSelectCancel" style="display:none;" onclick="exitMultiSelectMode()">取消</button>
+            <button class="nav-action" id="chatNavMore" style="display:none;" onclick="openChatSettings()">⋯</button>
+            <button class="nav-action" id="wechatNavAction" onclick="onWechatNavAction()">+</button>
+          </div>
+        </div>
+        <div class="wechat-app">
+
+          <!-- 聊天 Tab -->
+          <div class="wechat-content" id="wechatTabChat">
+            <div class="chat-tab-content" id="chatListView" style="display:flex;flex-direction:column;height:100%;">
+              <div class="chat-list" id="chatListContainer" style="flex:1;">
+                <div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" style="stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:0.5;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div class="empty-text">还没有聊天</div></div>
+              </div>
+            </div>
+            <div class="chat-detail-inline" id="chatDetailView">
+              <div class="chat-detail-body" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;">
+                <div class="chat-messages" id="chatMessagesContainer" style="flex:1;">
+                  <div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" style="stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:0.5;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div class="empty-text">开始聊天吧</div></div>
+                </div>
+                <div style="position:relative;">
+                  <div class="scroll-bottom-btn" id="scrollBottomBtn" onclick="scrollChatToBottom()">↓</div>
+                </div>
+                <div class="chat-input-area">
+                  <div class="chat-reply-bar" id="chatReplyBar" style="display:none;">
+                    <div class="chat-reply-content" id="chatReplyContent"></div>
+                    <button class="chat-reply-close" onclick="cancelReply()" title="取消引用">✕</button>
+                  </div>
+                  <button class="chat-input-extra" onclick="toggleInputPanel()">+</button>
+                  <textarea id="chatMessageInput" class="chat-input-box" rows="1" placeholder="说点什么..." onkeydown="handleChatInputKey(event)"></textarea>
+                  <button class="chat-send-msg-btn" onclick="sendChatMessage()">发送</button>
+                  <button class="chat-call-ai-btn" onclick="callAIResponse()" title="戳一下，让TA继续说"><svg viewBox="0 0 24 24" aria-hidden="true" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><polygon points="8 5 19 12 8 19 8 5"/></svg></button>
+                </div>
+                <div class="emoji-picker" id="emojiPicker">
+                  <div class="emoji-picker-header">
+                    <button class="emoji-picker-btn manage" id="manageEmojiBtn" onclick="toggleEmojiManagement()">管理</button>
+                  </div>
+                  <div class="emoji-grid" id="emojiGrid"></div>
+                </div>
+                <!-- 表情包选择面板（聊天内嵌） -->
+                <div class="sticker-picker" id="stickerPicker">
+                  <div class="sticker-picker-header">
+                    <div class="sticker-picker-tabs" id="stickerPickerTabs"></div>
+                  </div>
+                  <div class="sticker-picker-grid" id="stickerPickerGrid"></div>
+                </div>
+                <div class="input-panel" id="inputExtraPanel">
+                  <div class="input-panel-grid">
+                    <div class="input-panel-item spectate-allowed" onclick="retryLastAIMessage()" title="重新生成最后一条AI回复"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></div><div class="item-label">重新生成</div></div>
+                    <div class="input-panel-item spectate-allowed" onclick="enterMultiSelectMode()" title="多选消息（转发/删除）"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></div><div class="item-label">多选</div></div>
+                    <label class="input-panel-item lp-file-trigger" title="发送图片"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="item-label">图片</div><input type="file" accept="image/*" onchange="handleFilePick(event)"></label>
+                    <div class="input-panel-item" onclick="startSimulatedPhoto()" title="模拟拍照（文字描述生成照片卡片）"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><div class="item-label">拍照</div></div>
+                    <div class="input-panel-item" onclick="openEmojiPicker()" title="发送表情"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div><div class="item-label">表情</div></div>
+                    <div class="input-panel-item" onclick="toggleStickerPicker()" title="发送表情包"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="2" width="8" height="8" rx="2"/><rect x="14" y="2" width="8" height="8" rx="2"/><rect x="2" y="14" width="8" height="8" rx="2"/><rect x="14" y="14" width="8" height="8" rx="2"/></svg></div><div class="item-label">表情包</div></div>
+                    <div class="input-panel-item" onclick="startVoiceInput()" title="发送语音"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><div class="item-label">语音</div></div>
+                    <div class="input-panel-item" onclick="openToolboxFromChat()" title="打开工具箱"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="item-label">工具箱</div></div>
+
+                    <div class="input-panel-item" onclick="openReadTogether()" title="一起看书"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div class="item-label">看书</div></div>
+                    <div class="input-panel-item" onclick="openMusicPanel()" title="一起听歌"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M9 18V5l10-2v13"/><circle cx="7" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div><div class="item-label">听歌</div></div>
+                    <div class="input-panel-item" onclick="window.LittlePhoneWatch.open()" title="陪看视频"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div><div class="item-label">陪看</div></div>
+                    <div class="input-panel-item" onclick="openRedEnvelopePanel()" title="发起转账"><div class="item-icon"><svg viewBox="0 0 24 24" width="20" height="20" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 9h10M7 15h10M14 6l3 3-3 3M10 12l-3 3 3 3"/></svg></div><div class="item-label">转账</div></div>
+                    <div class="input-panel-item" id="groupManageBtn" onclick="if(typeof openGroupMemberManager==='function')openGroupMemberManager()" title="群成员管理" style="display:none;"><div class="item-icon"><svg viewBox="0 0 24 24" width="20" height="20" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="9" cy="7" r="3.5"/><path d="M2 21v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/><path d="M16 3.13a3.5 3.5 0 0 1 0 6.75"/></svg></div><div class="item-label">群管理</div></div>
+                    <div class="input-panel-item" onclick="window.LittlePhoneCall.open(APP.currentChatFriend&&APP.currentChatFriend.id)" title="打电话"><div class="item-icon"><svg viewBox="0 0 24 24" width="20" height="20" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="item-label">通话</div></div>
+                    <div class="input-panel-item" id="blockFriendBtn" onclick="toggleBlockFriend()" title="拉黑/小黑屋"><div class="item-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><div class="item-label" id="blockFriendLabel">拉黑</div></div>
+                    <div class="input-panel-item" id="charPhoneBtn" onclick="openCharPhone()" title="角色手机"><div class="item-icon"><svg viewBox="0 0 24 24" width="20" height="20" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="item-label">角色手机</div></div>
+                  </div>
+                </div>
+                <!-- 离线模式底部输入 -->
+                <div class="offline-bottom-bar" id="offlineBottomBar">
+                  <button class="offline-btn secondary" onclick="regenerateLatestOffline()" title="重写"><svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+                  <textarea id="offlineChatInput" class="offline-input" rows="1" placeholder="继续剧情..." onkeydown="handleOfflineInputKey(event)"></textarea>
+                  <button class="offline-btn primary" onclick="sendOfflineMessage()"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><polygon points="8 5 19 12 8 19 8 5"/></svg></button>
+                </div>
+                <!-- 多选工具栏（删除 / 转发） -->
+                <div class="multi-select-toolbar" id="chatMultiSelectBar" style="display:none;position:relative;bottom:auto;left:auto;right:auto;">
+                  <span class="multi-select-count" id="chatMultiSelectCount">已选 0 条</span>
+                  <div class="multi-select-actions">
+                    <button class="multi-select-btn" onclick="forwardSelectedMessages()" style="background:var(--monet-blue,#8FAFBF);color:#fff;border:none;">转发</button>
+                    <button class="multi-select-btn" onclick="deleteSelectedMessages()" style="background:#EF4444;color:#fff;border:none;">删除</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 联系人 Tab -->
+          <div class="wechat-content" id="wechatTabContacts" style="display:none;">
+            <div style="display:flex;align-items:center;padding:10px 16px 6px;gap:6px;">
+              <div class="me-menu-title" style="flex:1;margin:0;">好友列表</div>
+              <button class="nav-action" id="contactsAddBtn" style="font-size:11px;letter-spacing:0.5px;padding:3px 8px;" onclick="contactsCreateFolderPrompt()">新增列表</button>
+              <button class="nav-action" id="contactsEditBtn" style="font-size:11px;letter-spacing:0.5px;padding:3px 8px;" onclick="toggleContactsEditMode()">管理</button>
+            </div>
+            <div id="contactsList" style="padding:0 8px;">
+              <div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">还没有 AI 角色</div></div>
+            </div>
+            <!-- ★ 联系人编辑模式底部操作栏 -->
+            <div id="contactsEditBar" style="display:none;position:sticky;bottom:0;background:var(--surface-card,#fff);border-top:1px solid var(--border-light,#e8e0d8);padding:10px 14px;align-items:center;gap:8px;z-index:50;box-shadow:0 -2px 8px rgba(0,0,0,0.04);">
+              <span class="contacts-edit-count">已选 0 个</span>
+              <select id="contactsEditSelect" class="form-input" style="width:auto;padding:4px 8px;font-size:12px;margin-right:6px;"></select>
+              <button class="folder-edit-move-btn" onclick="var sel=document.getElementById('contactsEditSelect');if(sel)moveSelectedToContactsFolder(sel.value)">移动</button>
+            </div>
+          </div>
+
+          <!-- 朋友圈 Tab -->
+          <div class="wechat-content" id="wechatTabMoments" style="display:none;">
+            <div class="moments-tab-content">
+              <div class="moments-top-bar">
+                <span class="moments-top-title">朋友圈</span>
+                <div class="moments-top-btns">
+                  <button class="moments-top-btn" onclick="showAiPostMomentDialog()" title="角色发朋友圈">
+                    <svg viewBox="0 0 24 24" width="18" height="18" style="fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><circle cx="8" cy="7" r="4"/><path d="M2 21v-2a6 6 0 0 1 12 0v2"/><path d="M17 8h5"/><path d="M19.5 5.5v5"/></svg>
+                  </button>
+                  <button class="moments-top-btn" onclick="showNewMomentDialog()" title="发动态">
+                    <svg viewBox="0 0 24 24" width="18" height="18" style="fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="moments-cover" id="momentsCover" onclick="pickMomentsCover()" title="点击更换封面">
+                <div class="moments-cover-camera">📷</div>
+                <div class="moments-cover-name" id="momentsCoverName">我</div>
+              </div>
+              <div class="moments-list" id="momentsList" style="">
+                <div class="empty-state"><div class="empty-icon">📱</div><div class="empty-text">还没有动态</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 我的 Tab -->
+          <div class="wechat-content" id="wechatTabMe" style="display:none;">
+            <div class="me-tab-content" id="meTabMenu">
+              <div class="me-profile-card" id="meProfileCard">
+                <div class="avatar" style="width:64px;height:64px;border-radius:14px;font-size:28px;" id="meAvatar">
+                  <svg viewBox="0 0 24 24" width="28" height="28" style="stroke:var(--monet-blue);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-5 4-9 9-9s9 4 9 9"/></svg>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:20px;font-weight:var(--font-wt-bold);letter-spacing:0.5px;color:var(--ink);" id="meName">我</div>
+                  <div style="font-size:12px;color:var(--ink-subtle);margin-top:3px;font-weight:var(--font-wt-regular);letter-spacing:0.5px;" id="meMaskInfo">点击编辑我的面具</div>
+                </div>
+              </div>
+              <div class="me-menu-section" id="meActiveMaskSection" style="display:none;">
+                <div class="me-menu-title">当前身份（论坛发帖/评论用）</div>
+                <div class="me-menu-item" id="meActiveMaskRow" onclick="showActiveMaskPicker()">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-5 4-9 9-9s9 4 9 9"/></svg></div><div class="me-menu-label">未选择</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+              </div>
+              <div class="me-menu-section">
+                <div class="me-menu-title">面具管理</div>
+                <div class="me-menu-item" onclick="openSettingsPage('maskPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-5 4-9 9-9s9 4 9 9"/></svg></div><div class="me-menu-label">我的面具</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+              </div>
+              <div class="me-menu-section">
+                <div class="me-menu-title">工具箱</div>
+                <div class="me-menu-item" onclick="openToolbox()">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="me-menu-label">工具箱</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('mcpPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="me-menu-label">MCP 工具</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+              </div>
+              <div class="me-menu-section">
+                <div class="me-menu-title">通用</div>
+                <div class="me-menu-item" onclick="showGuide(0)">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div class="me-menu-label">新手指南</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="toggleDarkMode()">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/></svg></div><div class="me-menu-label">夜间模式</div></div>
+                  <span id="darkModeToggle" style="font-size:13px;color:var(--ink-subtle);">☀️</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('proactivePage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 9 8 12 2 12"/></svg></div><div class="me-menu-label">主动发消息</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('petPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 12h.01"/><path d="M16 12h.01"/><path d="M9 16c2 1 4 1 6 0"/></svg></div><div class="me-menu-label">桌宠悬浮球</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openStickerLibraryFromMe()">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><div class="me-menu-label">表情包管理</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('chatAPIPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="me-menu-label">聊天 &amp; 生图 API</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('selfCheckPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div><div class="me-menu-label">API 自检</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('apiErrorLogsPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg></div><div class="me-menu-label">API 报错日志</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('minimaxAPIPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><div class="me-menu-label">语音 API</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('embeddingsAPIPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="me-menu-label">向量 &amp; ASR</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('chatPromptPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><polyline points="8 10 12 14 16 10"/></svg></div><div class="me-menu-label">聊天提示词</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="openSettingsPage('appearancePage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg></div><div class="me-menu-label">外观设置</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+              </div>
+              <div class="me-menu-section">
+                <div class="me-menu-title">数据</div>
+                <div class="me-menu-item" onclick="openSettingsPage('cloudBackupPage')">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><div class="me-menu-label">云备份</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="exportAllData()">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="me-menu-label">备份数据</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="importAllData()">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div class="me-menu-label">恢复数据</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" id="meMenuLegacyRestore" style="display:none;" onclick="legacyRestoreTap()">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></div><div class="me-menu-label">旧版数据找回</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+                <div class="me-menu-item" onclick="resetAllData()">
+                  <div class="me-menu-left"><div class="me-menu-icon"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div><div class="me-menu-label" style="color:#FF6B7B;">恢复出厂设置</div></div>
+                  <span style="color:var(--ink-subtle);">→</span>
+                </div>
+              </div>
+              <div style="padding:14px 16px;margin-top:4px;border-top:1px solid var(--border-separator,#e8ddd0);">
+                <div style="font-size:10px;color:var(--ink-subtle);line-height:1.9;text-align:center;opacity:0.75;">
+                  <b>免责声明</b><br>
+                  本工具为 AI 聊天客户端壳程序，不提供 AI 模型服务。<br>
+                  所有对话内容由用户自行配置的第三方 API 生成。<br>
+                  请勿用于违法违规用途。<br>
+                  未成年人请在监护人指导下使用。<br>
+                  使用即表示同意：一切后果由用户自行承担。<br>
+                  <span>🐋 鲸鱼机 · 交流群见</span>
+                </div>
+              </div>
+              <div id="meVersionFooter" class="me-version-footer" onclick="showAppVersionInfo()" title="查看当前版本">
+                当前版本 <span id="meVersionLabel">检查中...</span>
+              </div>
+            </div>
+            <div class="settings-inline" id="settingsInlineView">
+              <div id="settingsInlineContent" style="flex:1;overflow-y:auto;"></div>
+            </div>
+          </div>
+
+          <!-- 底部四 Tab -->
+          <div class="wechat-tabs">
+            <div class="wechat-tab active" data-tab="chat" onclick="switchWechatTab('chat')"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>聊天</div>
+            <div class="wechat-tab" data-tab="contacts" onclick="switchWechatTab('contacts')"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><circle cx="9" cy="7" r="3.5"/><path d="M2 21v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/><path d="M16 3.13a3.5 3.5 0 0 1 0 6.75"/></svg></span>联系人</div>
+            <div class="wechat-tab" data-tab="moments" onclick="switchWechatTab('moments')"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></span>朋友圈</div>
+            <div class="wechat-tab" data-tab="me" onclick="switchWechatTab('me')"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></span>我的</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ ⚙️ 聊天设置 ═══════════ -->
+      <div id="chatSettingsPage" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="closeChatSettings()">←</button>
+          <div class="nav-title">聊天设置</div>
+          <div></div>
+        </div>
+        <div class="settings-content" id="chatSettingsContent"></div>
+      </div>
+
+      <!-- ═══════════ 🌌 独立沙盒 ═══════════ -->
+      <div id="rpModeScreen" class="page">
+        <div class="nav-bar offline-story-nav rp-mode-nav">
+          <button class="nav-btn offline-story-back-btn" onclick="pauseRPMode()" title="暂离" aria-label="暂离">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="nav-title offline-story-title"><span id="rpModeTitle">平行世界</span><span class="nav-subtitle">平行沙盒</span></div>
+          <div class="nav-actions offline-story-nav-actions rp-nav-menu-wrap">
+            <span class="nav-status offline-story-status" id="rpModeStatus" title="好感度与内心话" aria-label="好感度与内心话"></span>
+            <button class="nav-btn offline-story-more-btn" onclick="toggleRPNavPanel(event)" title="更多操作" aria-label="更多操作" aria-haspopup="menu" aria-expanded="false">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+            </button>
+            <div class="isolated-offline-panel rp-nav-panel" id="rpNavPanel" role="menu">
+              <button type="button" role="menuitem" onclick="toggleRPNavPanel();editChatBackgroundForRP()"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>聊天背景</span></button>
+              <button type="button" role="menuitem" onclick="toggleRPNavPanel();regenerateRPResponse()"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg><span>重写回复</span></button>
+              <button type="button" role="menuitem" onclick="toggleRPNavPanel();closeRPMode()"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h6"/></svg><span>总结并退出</span></button>
+              <button type="button" role="menuitem" onclick="toggleRPNavPanel();discardRPMode()"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg><span>放弃并清空</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="rp-story-area" id="rpStoryArea">
+          <div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" style="stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:0.5;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div class="empty-text">开始你们的角色扮演</div></div>
+        </div>
+        <div class="rp-input-bar">
+          <textarea id="rpUserInput" class="rp-textarea" rows="2" placeholder="写下你的行动、对话或叙述..." onkeydown="handleRPInputKey(event)"></textarea>
+          <button class="rp-send-btn" onclick="sendRPMessage()">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3.4 20.4l17.4-8.4c.8-.4.8-1.6 0-2L3.4 1.6c-.8-.4-1.6.4-1.4 1.2l3.6 7.2c.2.4.2 1 0 1.4L2 19.2c-.2.8.6 1.6 1.4 1.2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══════════ 📖 单独线下 ═══════════ -->
+      <div id="isolatedOfflineScreen" class="page">
+        <div class="nav-bar offline-story-nav isolated-offline-nav">
+          <button class="nav-btn isolated-offline-back-btn" onclick="pauseIsolatedOffline()" title="暂离" aria-label="暂离">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="nav-title offline-story-title isolated-offline-title">
+            <span id="isolatedOfflineTitle">单独线下</span>
+            <span class="nav-subtitle">线下互动</span>
+          </div>
+          <div class="nav-actions offline-story-nav-actions isolated-offline-menu-wrap">
+            <span class="nav-status offline-story-status" id="isolatedOfflineStatus" title="好感度与内心话" aria-label="好感度与内心话"></span>
+            <button class="nav-btn isolated-offline-more-btn" onclick="toggleIsolatedOfflinePanel(event)" title="更多操作" aria-label="更多操作" aria-haspopup="menu" aria-expanded="false">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+            </button>
+            <div class="isolated-offline-panel" id="isolatedOfflinePanel" role="menu">
+              <button type="button" role="menuitem" onclick="toggleIsolatedOfflinePanel();editChatBackgroundForOffline()">
+                <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>聊天背景</span>
+              </button>
+              <button type="button" role="menuitem" onclick="toggleIsolatedOfflinePanel();enterIsolatedOfflineMultiSelect()">
+                <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+                <span>多选删除</span>
+              </button>
+              <button type="button" role="menuitem" id="isolatedOfflineRegenerateBtn" onclick="toggleIsolatedOfflinePanel();regenerateIsolatedOffline()">
+                <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
+                <span>重写回复</span>
+              </button>
+              <button type="button" role="menuitem" id="isolatedOfflineSummaryBtn" onclick="toggleIsolatedOfflinePanel();summarizeAndExitIsolatedOffline()">
+                <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h6"/></svg>
+                <span>总结并退出</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="isolated-offline-area" id="isolatedOfflineArea">
+          <div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" width="32" height="32" style="stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:0.5;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="empty-text">线下互动将在这里以卡片形式展开</div></div>
+        </div>
+        <div style="position:relative;">
+          <div class="multi-select-toolbar" id="isolatedOfflineMultiSelectBar" style="display:none;position:relative;bottom:auto;left:auto;right:auto;">
+            <span class="multi-select-count" id="isolatedOfflineSelectCount">已选 0 条</span>
+            <div class="multi-select-actions">
+              <button class="multi-select-btn" onclick="exitIsolatedOfflineMultiSelect()" style="background:transparent;color:var(--ink);border:1px solid var(--border-light);">取消</button>
+              <button class="multi-select-btn" onclick="deleteSelectedIsolatedOffline()" style="background:#EF4444;color:#fff;border:none;">删除</button>
+            </div>
+          </div>
+          <!-- ★ 2026-08-15：按线上输入栏模式 = 输入框 + 播放键 + 发送键 -->
+          <div class="isolated-offline-input-bar" id="isolatedOfflineInputBar">
+            <textarea id="isolatedOfflineInput" class="rp-textarea" rows="1" placeholder="写下你的行动、对话..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendIsolatedOfflineMessage();}"></textarea>
+            <button class="rp-send-btn io-send-text-btn" id="isolatedOfflineSendBtn" onclick="sendIsolatedOfflineMessage()">发送</button>
+            <button class="rp-send-btn io-summon-btn" id="isolatedOfflineSummonBtn" onclick="triggerIsolatedOfflineAI()" title="召唤 AI 回复" aria-label="召唤 AI 回复">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor"><path d="M8 5l11 7-11 7V5z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 😊 表情包 ═══════════ -->
+      <div id="stickerLibraryScreen" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="closeStickerLibrary()">←</button>
+          <div class="nav-title">表情包</div>
+          <div class="nav-actions">
+            <button class="nav-action" id="stickerManageBtn" onclick="toggleStickerManageMode()" style="font-size:12px;">管理</button>
+            <button class="nav-action" onclick="openStickerAddModal()">+</button>
+          </div>
+        </div>
+        <div class="sticker-tabs-scroll" id="stickerGroupTabs"></div>
+        <div class="wechat-content" style="padding-bottom:60px;padding-top:0;">
+          <div class="sticker-library-grid" id="stickerLibraryGrid"></div>
+        </div>
+        <div class="multi-select-toolbar" id="stickerBottomBar">
+          <span class="multi-select-count" id="stickerSelectCount">已选 0 张</span>
+          <div class="multi-select-actions">
+            <button class="multi-select-btn" id="stickerSelectAllBtn" onclick="toggleSelectAllStickers()" style="background:transparent;color:var(--ink);border:1px solid var(--border-light);">全选</button>
+            <button class="multi-select-btn" onclick="batchBindStickersToChar()" style="background:var(--monet-blue);color:#fff;border:none;">绑定角色</button>
+            <button class="multi-select-btn" onclick="deleteSelectedStickers()" style="background:#EF4444;color:#fff;border:none;">删除</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 📖 世界书 ═══════════ -->
+      <div id="worldbookApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">世界书</div>
+          <div class="nav-actions">
+            <button class="nav-action" onclick="showNewWorldBookFolderPrompt()" style="font-size:11px;display:flex;align-items:center;gap:2px;" title="新建文件夹"><svg viewBox="0 0 24 24" width="15" height="15" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></button>
+            <button class="nav-action" onclick="importWorldBook()" style="font-size:11px;">导入</button>
+            <button class="nav-action" onclick="showNewWorldBookDialog()">+</button>
+          </div>
+        </div>
+        <!-- ★ 2026-08-15：世界书 / 文本规则 tab -->
+        <div style="display:flex;gap:8px;padding:10px 18px 0;">
+          <button class="form-btn secondary" id="wbTabBooksBtn" onclick="switchWorldBookTab('books')" style="flex:1;">世界书</button>
+          <button class="form-btn secondary" id="wbTabRulesBtn" onclick="switchWorldBookTab('rules')" style="flex:1;">文本规则</button>
+        </div>
+        <div style="padding:10px 18px;font-size:12px;color:var(--ink-subtle);font-weight:300;letter-spacing:0.8px;" id="wbTabHint">世界书定义 AI 性格语气，在创建聊天时绑定到角色。<svg viewBox="0 0 24 24" width="14" height="14" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 可创建文件夹分类管理。</div>
+        <div id="worldBookList" style="flex:1;overflow-y:auto;"></div>
+        <div id="regexRulesPanel" style="display:none;flex:1;overflow-y:auto;"></div>
+      </div>
+
+      <!-- ═══════════ 🧠 记忆 ═══════════ -->
+      <div id="memoryApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">记忆</div>
+        </div>
+        <div id="memoryList" style="flex:1;overflow-y:auto;"></div>
+      </div>
+
+      <!-- ═══════════ 🎵 音乐 ═══════════ -->
+      <div id="musicApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">音乐</div>
+          <button class="nav-btn" onclick="window.LittlePhoneMusic && window.LittlePhoneMusic.showNeteaseLoginPanel()" title="网易云登录">
+            <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+          </button>
+        </div>
+        <div id="musicContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;"></div>
+      </div>
+
+      <!-- ═══════════ 🎬 陪看 ═══════════ -->
+      <div id="watchApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">陪看模式</div>
+          <button class="nav-btn" onclick="window.LittlePhoneWatch && window.LittlePhoneWatch._toggleWatch()" title="开启/关闭">
+            <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="9"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          </button>
+        </div>
+        <div id="watchContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;"></div>
+      </div>
+
+      <!-- ═══════════ 🛍 商城 ═══════════ -->
+      <div id="mallApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">商城</div>
+        </div>
+        <div id="mallContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;"></div>
+      </div>
+
+      <!-- ═══════════ 🐟 寻宝集 ═══════════ -->
+      <div id="secondhandApp" class="page">
+        <div id="secondhandContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;min-height:0;height:100%;"></div>
+      </div>
+
+      <!-- ═══════════ 🏺 漂流瓶 ═══════════ -->
+      <div id="driftBottleApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">漂流瓶</div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button class="nav-btn" onclick="toggleDBCharDropdown()" title="选择角色" style="font-size:13px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+            </button>
+            <div class="db-char-select">
+              <div class="db-char-dropdown" id="dbCharDropdown"></div>
+            </div>
+            <button class="nav-btn" onclick="refreshDriftBottles()" title="刷新">
+              <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="driftBottleContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;"></div>
+      </div>
+
+      <!-- ═══════════ 🕸️ 关系网 ═══════════ -->
+      <div id="relationsApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">关系网</div>
+          <div style="width:36px;"></div>
+        </div>
+        <div id="relationsContent" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;"></div>
+      </div>
+
+      <!-- ═══════════ 🎧 一起听 ═══════════ -->
+      <div id="listenTogetherApp" class="page">
+        <div id="listenTogetherContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;min-height:0;height:100%;"></div>
+      </div>
+
+      <!-- ═══════════ 🍅 番茄钟 ═══════════ -->
+      <div id="pomodoroApp" class="page">
+        <div id="pomodoroContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;min-height:0;height:100%;"></div>
+      </div>
+
+      <!-- ═══════════ 📞 打电话 ═══════════ -->
+      <div id="callApp" class="page">
+        <div id="callContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;min-height:0;height:100%;"></div>
+      </div>
+
+      <!-- ═══════════ 论坛 ═══════════ -->
+      <div id="forumApp" class="page">
+        <div id="forumContent" style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;min-height:0;height:100%;"></div>
+      </div>
+
+      <!-- ═══════════ 🔖 同人 ═══════════ -->
+      <div id="fanficApp" class="page">
+        <div class="ff-nav" id="ffNav"></div>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;">
+          <div class="ff-content" id="ffDiscover" style="display:block;"></div>
+          <div class="ff-content" id="ffPlaza" style="display:none;"></div>
+          <div class="ff-settings" id="ffSettings"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 🏠 家 ═══════════ -->
+      <div id="homeApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">家</div>
+          <div id="homePartnerSwitcher" class="home-partner-switcher"></div>
+          <div class="home-nav-right">
+            <select id="homePlaceSelect" onchange="HomeApp.switchPlace()"></select>
+            <button class="home-edit-btn" id="homeUploadPhotoBtn" onclick="HomeApp.uploadPlacePhoto()" title="上传背景照片" style="display:none;">
+              <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </button>
+            <button class="home-edit-btn" id="homeSeparateBtn" onclick="HomeApp.separate()" title="分开" style="color:#e74c3c;">
+              <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M17 16l4-4-4-4"/><path d="M7 8l-4 4 4 4"/><line x1="9" y1="4" x2="15" y2="20"/></svg>
+            </button>
+            <button class="home-edit-btn" id="homeEditToggle" onclick="HomeApp.toggleEditMode()" title="编辑模式">
+              <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+            <button class="home-edit-btn" id="homeClearSpritesBtn" onclick="HomeApp.clearAllSprites()" title="清除全部立绘" style="display:none;color:#e74c3c;">
+              <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+            <button class="home-edit-btn" onclick="HomeApp.uploadSpriteUI()" title="上传立绘">
+              <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="12" x2="12" y2="14"/></svg>
+            </button>
+            <button class="home-edit-btn" onclick="HomeApp.openPlaceManager()" title="地点管理">
+              <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </button>
+            <button class="home-edit-btn" onclick="toggleHomeFullscreen()" title="全屏" style="font-size:14px;">⛶</button>
+          </div>
+        </div>
+        <div id="homeContent" class="home-content"></div>
+        <!-- 过场动画 -->
+        <div id="homeTransition" class="home-transition">
+          <div class="home-transition-text"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 📅 日历 ═══════════ -->
+      <div id="calendarApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="CalendarApp.close()">←</button>
+          <div class="nav-title">日历</div>
+          <div class="nav-actions">
+            <select id="calendarCharSelect" class="nav-select" onchange="CalendarApp.selectCharacter(this.value)" style="max-width:140px;"></select>
+          </div>
+        </div>
+        <div id="calendarContent" style="flex:1;display:flex;flex-direction:column;overflow-y:auto;min-height:0;"></div>
+      </div>
+
+      <!-- ═══════════ 📝 回忆 ═══════════ -->
+      <div id="recallApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">回忆</div>
+          <div style="width:40px;"></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;" id="recallAppContent"></div>
+      </div>
+
+      <!-- ═══════════ 📔 共同日记（2026-09-02 玩法三） ═══════════ -->
+      <div id="diaryApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">日记</div>
+          <div style="width:40px;"></div>
+        </div>
+        <div id="diaryList" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;"></div>
+      </div>
+
+      <!-- ═══════════ 🎨 主题 ═══════════ -->
+      <div id="themeApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">主 题</div>
+          <div class="nav-actions">
+            <button class="nav-action" onclick="saveThemeSettings()">保存</button>
+          </div>
+        </div>
+        <div class="theme-content">
+          <div class="form-card">
+            <div class="theme-section-title">桌面壁纸</div>
+            <div style="display:flex;gap:10px;padding:8px 18px 14px;">
+              <button class="form-btn secondary" onclick="pickWallpaper()" style="flex:1;">上传壁纸</button>
+              <button class="form-btn secondary" onclick="resetWallpaper()" style="flex:1;">恢复默认</button>
+            </div>
+          </div>
+          <div class="form-card" style="margin-top:12px;">
+            <div class="theme-section-title">预设色调 · 莫奈印象</div>
+            <div class="theme-preset-grid" id="themePresets"></div>
+          </div>
+          <div class="form-card" style="margin-top:12px;">
+            <div class="theme-section-title">夜间气泡配色</div>
+            <label class="form-group-row switch-row" style="padding:6px 18px;">
+              <span class="form-label">夜间沿用日间气泡配色</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="nightFollowDayToggle" onchange="setNightFollowDay(this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+            </label>
+            <div class="form-hint" style="padding:0 18px 14px;font-size:11px;line-height:1.6;">自定义美化只写了日间样式时，开这个开关——夜间气泡直接沿用日间颜色，美化不会"一到晚上就失效"。想让日夜间不一样，就在自定义 CSS 里再写一套 html.dark-mode { ... }。</div>
+          </div>
+          <div class="form-card" style="margin-top:12px;">
+            <div class="theme-section-title">状态栏颜色</div>
+            <label class="form-group-row switch-row" style="padding:12px 18px;">
+              <span class="form-label">显示状态栏</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="statusBarVisibleToggle" onchange="applyStatusBarPreview()">
+                <span class="toggle-slider"></span>
+              </label>
+            </label>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:8px 18px 14px;">
+              <div>
+                <div style="font-size:11px;color:var(--ink-subtle);margin-bottom:4px;">顶部背景</div>
+                <input type="text" id="statusBarBgText" placeholder="#RRGGBB 或 transparent" oninput="applyStatusBarPreview()" onchange="applyStatusBarPreview()" style="width:100%;padding:6px 10px;font-size:13px;border:0.5px solid var(--border-light);border-radius:8px;background:var(--surface-input);color:var(--ink);">
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--ink-subtle);margin-bottom:4px;">图标文字</div>
+                <input type="text" id="statusBarIconText" placeholder="#RRGGBB" oninput="applyStatusBarPreview()" onchange="applyStatusBarPreview()" style="width:100%;padding:6px 10px;font-size:13px;border:0.5px solid var(--border-light);border-radius:8px;background:var(--surface-input);color:var(--ink);">
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--ink-subtle);margin-bottom:4px;">底部栏色</div>
+                <input type="text" id="statusBarBottomText" placeholder="默认跟随顶部" oninput="applyStatusBarPreview()" onchange="applyStatusBarPreview()" style="width:100%;padding:6px 10px;font-size:13px;border:0.5px solid var(--border-light);border-radius:8px;background:var(--surface-input);color:var(--ink);">
+              </div>
+            </div>
+          </div>
+          <div class="form-card" style="margin-top:12px;">
+            <div class="theme-section-title">桌面 / 主页文字颜色</div>
+            <div id="desktopTextColorControls" style="padding:8px 18px 4px;"></div>
+            <div style="padding:0 18px 12px;">
+              <button class="form-btn secondary" onclick="resetAllDesktopTextColors()" style="width:100%;">恢复全部默认颜色</button>
+            </div>
+          </div>
+          <div class="form-card" style="margin-top:12px;">
+            <div class="theme-section-title">我的美化预设</div>
+            <div id="userThemePresets" style="padding:0 18px 8px;">
+              <div style="text-align:center;color:var(--ink-subtle);font-size:12px;padding:10px 0;">暂无保存的预设</div>
+            </div>
+            <div style="padding:0 18px 12px;">
+              <button class="form-btn secondary" onclick="saveAsUserThemePreset()" style="width:100%;">保存当前为预设</button>
+            </div>
+          </div>
+          <div class="form-card" style="margin-top:12px;">
+            <div class="form-group-row switch-row">
+              <label class="form-label">启用自定义 CSS</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="themeCustomCSSEnabled" onchange="toggleCustomCSSSection()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div id="customCSSSection" style="display:none;padding:0 18px 14px;">
+              <textarea id="themeCustomCSS" class="form-input" style="min-height:200px;font-family:'SF Mono','Consolas',monospace;font-size:12px;line-height:1.6;letter-spacing:0;"
+                        placeholder="/* 直接粘贴 CSS 即可，支持带 ```css 标记的小鲸鱼输出，保存时自动清洗 */&#10;:root { --monet-blue: #f48fb1; --ink: #d81b60; }&#10;html.dark-mode { --surface-card: #4a142c; }"></textarea>
+              <div class="form-hint" style="margin-top:8px;font-size:11px;line-height:1.7;">💡 夜间模式有独立的气泡配色（写在 html.dark-mode 里），只写 :root 的美化到夜间会显得没变化。<br>两种办法：① 上面「夜间气泡颜色」打开「夜间沿用日间气泡配色」；② 想日夜间不一样，就再写一套 <b>html.dark-mode { --bubble-mine: ...; --bubble-other: ...; }</b></div>
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <label class="form-btn secondary lp-file-trigger" style="flex:1;">导入 CSS
+                  <input type="file" id="themeCSSFileInput" accept=".css" onchange="importCSSFile(event)">
+                </label>
+                <button class="form-btn secondary" onclick="resetCustomCSS()" style="flex:1;">重置</button>
+                <button class="form-btn secondary" onclick="confirmClearAllBeautify()" style="flex:1;color:#e0245e;border-color:#e0245e;">一键清除全部美化</button>
+              </div>
+              <button class="form-btn primary" onclick="openMarketUpload()" style="width:100%;margin-top:10px;">🎨 发布到美化商城</button>
+              <details id="selectorCheatSheet" style="margin-top:10px;">
+                <summary style="font-size:12px;color:var(--ink-light);cursor:pointer;">📋 常用选择器速查表（点开抄，复制后直接粘进 CSS）</summary>
+                <div id="selectorCheatList" style="margin-top:4px;"></div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 🎨 美化商城 ═══════════ -->
+      <div id="marketApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">美化商城</div>
+          <div class="nav-actions"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 🧰 工具箱 ═══════════ -->
+      <div id="toolboxApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">工具箱</div>
+          <div class="nav-actions">
+            <button class="nav-action" onclick="showNewToolDialog()">+</button>
+          </div>
+        </div>
+        <div class="toolbox-content">
+          <div class="toolbox-actions">
+            <button class="form-btn primary" onclick="showNewToolDialog()">新建工具</button>
+            <label class="form-btn secondary lp-file-trigger" style="flex:1;">导入 HTML
+              <input type="file" id="toolImportFileInput" accept=".html,.htm,.txt" onchange="importToolHTMLFile(event)">
+            </label>
+            <button class="form-btn" onclick="openWechatApp();setTimeout(()=>openChatDetail('little-whale-system'),200)">找小鲸鱼</button>
+            <button class="form-btn secondary" onclick="exportAllTools()">导出全部</button>
+          </div>
+          <div class="tool-filter-bar" id="toolboxFilterBar"></div>
+          <div class="toolbox-grid" id="toolboxGrid">
+            <div class="toolbox-empty">
+              <div class="empty-icon">🧰</div>
+              <div class="empty-text">加载中...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 应用商店（2026-09-03 由游戏中心改造：内置游戏 + 用户上传 App） ═══════════ -->
+      <div id="gameApp" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="goBack()">←</button>
+          <div class="nav-title">应用商店</div>
+          <div class="nav-actions"><button class="nav-action" onclick="AppStore.openAdmin()">⚙️</button></div>
+        </div>
+        <div class="game-content" id="appStoreContent"></div>
+      </div>
+
+      <!-- ═══════════ 🛠️ 工具运行页 ═══════════ -->
+      <div id="toolRunnerPage" class="page">
+        <div class="nav-bar">
+          <button class="nav-btn" onclick="closeToolRunner()">←</button>
+          <div class="nav-title" id="toolRunnerTitle">工具</div>
+          <div></div>
+        </div>
+        <div class="tool-runner-bar" id="toolRunnerBar">
+          <span style="font-size:13px;color:var(--ink-light);letter-spacing:1px;">角色：</span>
+          <select class="tool-runner-select" id="toolRunnerFriendSelect" onchange="onToolRunnerRoleChange()">
+            <option value="">-- 选择 --</option>
+          </select>
+          <label class="tool-sync-toggle" title="开启后，工具里的角色对话会同步到聊天记录">
+            <input type="checkbox" id="toolSyncToChatCheck" checked onchange="window._toolSyncToChat=this.checked">
+            <span>💬</span>
+          </label>
+          <button class="tool-send-btn" id="toolSendResultBtn" onclick="triggerToolSendResult()" title="把工具最终结果发送到聊天">📤</button>
+          <button class="tool-send-btn" id="gameEndSessionBtn" onclick="endCurrentGameSession()" title="结束本局并写入角色记忆" style="display:none;">结束</button>
+        </div>
+        <div class="tool-runner" id="toolRunnerContent"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-overlay" id="appModal">
+    <div class="modal-container">
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-buttons" id="modalButtons"></div>
+    </div>
+  </div>
+
+  <input type="file" id="hiddenFileInput" class="lp-hidden-file-input" accept="image/*" onchange="handleFilePick(event)">
+  <input type="file" id="hiddenImportInput" class="lp-hidden-file-input" accept=".littlephone,.json" onchange="handleImportFile(event)">
+  <input type="file" id="hiddenAvatarInput" class="lp-hidden-file-input" accept="image/*" onchange="handleAvatarFilePick(event)">
+  <input type="file" id="charCardFileInput" class="lp-hidden-file-input" accept="text/plain,text/markdown,.txt,.md" onchange="handleCharCardFileImport(event)">
+
+  <!-- ═══════════════ 角色消息通知 ═══════════════ -->
+  <div id="msg-notification" onclick="openMsgNotification()">
+    <div id="msg-notif-avatar"></div>
+    <div id="msg-notif-content">
+      <div id="msg-notif-sender"></div>
+      <div id="msg-notif-text"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 音乐悬浮球 ═══════════════ -->
+  <div class="music-float-ball" id="musicFloatBall" style="display:none;" onclick="toggleFloatLyrics()">
+    <button class="music-float-close" onclick="event.stopPropagation();dismissFloatBall();" aria-label="隐藏悬浮">×</button>
+    <button class="music-float-compact-btn" onclick="event.stopPropagation();toggleFloatCompact();" aria-label="缩小">−</button>
+    <div class="music-float-disc" id="musicFloatDisc">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M9 18V5l10-2v13"/><circle cx="7" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+    </div>
+    <div class="music-float-info" id="musicFloatInfo">
+      <div class="music-float-title" id="musicFloatTitle">未在播放</div>
+      <div class="music-float-lyric" id="musicFloatLyric"></div>
+      <div class="music-float-lyric" id="musicFloatLyric2" style="opacity:0.6;font-size:10px;"></div>
+    </div>
+    <div class="music-float-controls">
+      <button class="music-float-ctrl" onclick="event.stopPropagation();prevMusic();" aria-label="上一首" title="上一首">
+        <svg viewBox="0 0 24 24" width="13" height="13"><path d="M6 6v12"/><path d="M19 6l-9 6 9 6z"/></svg>
+      </button>
+      <button class="music-float-ctrl main" id="musicFloatPlayBtn" onclick="event.stopPropagation();toggleMusic();" aria-label="播放/暂停" title="播放/暂停">
+        <svg viewBox="0 0 24 24" width="13" height="13"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="music-float-ctrl" onclick="event.stopPropagation();nextMusic();" aria-label="下一首" title="下一首">
+        <svg viewBox="0 0 24 24" width="13" height="13"><path d="M18 6v12"/><path d="M5 6l9 6-9 6z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ JS ═══════════════ -->
+  <script src="js/update-check.js?v=mtmyryjd"></script>
+  <script src="js/activation-local.js?v=local-no-activation-1"></script>
+  <script src="js/app.bundle.obf.js?v=mtmyryjd"></script>
+  <!-- ★ iOS 兜底：如果混淆 JS 在 iOS Safari 跑崩，5 秒后强制亮屏防黑屏 -->
+  <script>
+  (function(){var f=setTimeout(function(){var a=document.querySelector('.page.active');if(!a){var p=document.querySelector('.page');if(p){p.classList.add('active');p.style.opacity='1';p.style.zIndex='10';p.style.pointerEvents='auto';}}},5e3);window._iosFallbackClear=function(){clearTimeout(f);};})();
+  </script><script>
+// PWA Service Worker — 一次性迁移清理，后续由 sw.js activate 管理旧缓存
+if (window.LITTLEPHONE_APP_MODE && 'serviceWorker' in navigator) {
+  var APP_SW_CLEAN_KEY = 'littlephone_app_sw_cleanup_v227';
+  if (localStorage.getItem(APP_SW_CLEAN_KEY) !== '1') {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      return Promise.all(regs.map(function(reg) { return reg.unregister(); }));
+    }).then(function() {
+      if (window.caches) {
+        return caches.keys().then(function(names) {
+          return Promise.all(names.map(function(name) { return caches.delete(name); }));
+        });
+      }
+    }).then(function() {
+      localStorage.setItem(APP_SW_CLEAN_KEY, '1');
+      var params = new URLSearchParams(location.search);
+      if (params.get('lpclean') !== '1') {
+        params.set('lpclean', '1');
+        params.set('boot', Date.now().toString());
+        location.replace(location.pathname + '?' + params.toString());
+      }
+    }).catch(function(e) {
+      console.warn('[PWA] app mode cleanup failed:', e);
+    });
+  }
+} else if ('serviceWorker' in navigator) {
+  var SW_MIGRATION_KEY = 'littlephone_sw_migrated_20260627j';
+  var migrated = localStorage.getItem(SW_MIGRATION_KEY);
+  var _pendingSWRegistration = null;
+
+  // ★ 加载进度条控制
+  function updateLoadingProgress(pct, msg, sub) {
+    var bar = document.getElementById('app-loading-bar');
+    var text = document.getElementById('app-loading-text');
+    var subEl = document.getElementById('app-loading-sub');
+    if (bar) bar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+    if (text && msg) text.textContent = msg;
+    if (subEl) subEl.textContent = sub || '';
+  }
+  function hideLoadingOverlay() {
+    var overlay = document.getElementById('app-loading-overlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.4s';
+      setTimeout(function() { try { overlay.remove(); } catch(e) {} }, 500);
+    }
+  }
+  // 兜底：5 秒后如果还没消失，自动隐藏（防止某步卡死导致一直白屏）
+  setTimeout(function() {
+    var overlay = document.getElementById('app-loading-overlay');
+    if (overlay && overlay.style.opacity !== '0') {
+      updateLoadingProgress(100, '即将完成...', '');
+      setTimeout(hideLoadingOverlay, 600);
+    }
+  }, 5000);
+
+  function registerSW() {
+    navigator.serviceWorker.register('./sw.js?v=20260831-ios-canvas-fill-v2').then(function(reg) {
+      console.log('[PWA] SW registered:', reg.scope);
+
+      // ★ 监听 SW 更新：发现新版本时显示下载进度
+      reg.addEventListener('updatefound', function() {
+        var newWorker = reg.installing;
+        if (!newWorker) return;
+        updateLoadingProgress(25, '发现新版本...', '正在下载');
+        newWorker.addEventListener('statechange', function() {
+          if (newWorker.state === 'installed') {
+            updateLoadingProgress(70, '新版本已就绪', '即将刷新');
+            if (navigator.serviceWorker.controller) {
+              _pendingSWRegistration = reg;
+              showUpdateToast();
+            }
+          }
+        });
+      });
+
+      // ★ 如果已有 waiting SW，立刻显示更新提示
+      if (reg.waiting) {
+        _pendingSWRegistration = reg;
+        showUpdateToast();
+      }
+    }).catch(function(e) {
+      console.warn('[PWA] SW failed:', e);
+    });
+  }
+
+  // ★ 更新提示 toast
+  var _updateToastShown = false;
+  function showUpdateToast() {
+    if (_updateToastShown) return;
+    _updateToastShown = true;
+    var toast = document.createElement('div');
+    toast.id = 'swUpdateToast';
+    toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:99999;background:#1d9bf0;color:#fff;padding:12px 20px;border-radius:24px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(29,155,240,.4);white-space:nowrap;animation:sw-toast-in .3s ease;';
+    toast.textContent = '✨ 新版本可用，点击刷新';
+    toast.onclick = function() {
+      toast.textContent = '刷新中...';
+      toast.style.pointerEvents = 'none';
+      // 通知 waiting SW 立即激活；不能发给旧 controller，否则新版本不会接管
+      var waitingWorker = _pendingSWRegistration && _pendingSWRegistration.waiting;
+      if (waitingWorker) {
+        waitingWorker.postMessage({ type: 'skip_waiting' });
+      } else if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'skip_waiting' });
+      }
+      // 等 SW 激活后刷新
+      var reloaded = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function() {
+        if (!reloaded) { reloaded = true; window.location.reload(); }
+      });
+      // 兜底：2 秒后无论如何刷新
+      setTimeout(function() {
+        if (!reloaded) { reloaded = true; window.location.reload(); }
+      }, 2000);
+    };
+    document.body.appendChild(toast);
+    // 3 秒后自动消失
+    setTimeout(function() {
+      if (toast.parentNode) { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; }
+      setTimeout(function() { if (toast.parentNode) toast.remove(); }, 500);
+    }, 3000);
+  }
+
+  // 监听 SW 消息（installed / updated）
+  navigator.serviceWorker.addEventListener('message', function(event) {
+    if (event.data && (event.data.type === 'sw_installed' || event.data.type === 'sw_updated')) {
+      console.log('[PWA] SW 消息:', event.data.type, event.data.version);
+      showUpdateToast();
+    }
+  });
+
+  // ★ 页面已由 SW 控制后，检查是否有 waiting SW（说明上次更新没刷新）
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then(function(reg) {
+      if (reg.waiting) {
+        _pendingSWRegistration = reg;
+        showUpdateToast();
+      }
+    });
+  }
+
+  if (!migrated) {
+    // 一次性清理：注销旧 SW + 清空旧缓存，然后注册新版
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      return Promise.all(regs.map(function(reg) { return reg.unregister(); }));
+    }).then(function() {
+      if (window.caches) {
+        return caches.keys().then(function(names) {
+          return Promise.all(names.map(function(name) { return caches.delete(name); }));
+        });
+      }
+    }).then(function() {
+      localStorage.setItem(SW_MIGRATION_KEY, '1');
+      registerSW();
+    });
+  } else {
+    // 已迁移：正常注册，由 sw.js activate 清理旧版本缓存
+    registerSW();
+  }
+}
+
+	// ★ 全局错误捕获：只记 console，不弹 toast（避免浏览器扩展等第三方错误骚扰用户）
+	window.addEventListener('error', function(e) {
+	  if (e.target === window) {
+	    var fn = (e.filename || '');
+	    var isOurs = !fn || fn.includes('小手机') || fn.includes('littlephone') || fn.includes('/工具/') || fn.includes('/js/') || fn.includes('/css/');
+	    if (isOurs) {
+	      console.error('💥 JS错误:', e.message, '@', e.lineno, ':', e.colno);
+	    }
+	  }
+	}, true);
+	window.addEventListener('unhandledrejection', function(e) {
+	  console.error('💥 未处理的Promise:', e.reason);
+	});
+
+// ★ Esc 键兜底返回
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && typeof goBack === 'function') {
+    e.preventDefault();
+    goBack();
+  }
+});
+</script>
+
+</body>
+</html>
